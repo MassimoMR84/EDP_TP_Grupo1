@@ -1,17 +1,18 @@
+from validaciones import *
 from nodo import *
 
 class Conexion:
     
     tiposDisponibles=("Ferroviaria", "Automotor", "Fluvial", "Aerea") #tupla porque no se pueden modificar
     
-    def __init__(self, origen: Nodo, destino: Nodo, tipo: str, distancia: float, restriccion=None, valorRestriccion=None):
+    def __init__(self, origen: Nodo, destino: Nodo, tipo: str, distancia: int, restriccion=None, valorRestriccion=None):
         Conexion.validarNodo(origen)
         self.origen=origen
         Conexion.validarNodo(destino)
         self.destino=destino
         Conexion.validarTipo(tipo)
         self.tipo=tipo
-        Conexion.validarDistancia(distancia)
+        validar_numero_mayor_a_cero(distancia)
         self.distancia=distancia
         self.restriccion=restriccion
         self.valorRestriccion=valorRestriccion
@@ -55,8 +56,8 @@ def leer_conexiones(path, nodos: dict): #función para leer las conexiones del c
                 origen.agregarConexiones(conexion)  #se agrega la conexión al nodo origen
 
 
-# nodos=leer_nodos("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/nodos.csv")
-# conexiones=leer_conexiones("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/conexiones.csv",nodos)
+nodos=leer_nodos("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/nodos.csv")
+conexiones=leer_conexiones("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/conexiones.csv",nodos)
 
-# print(nodos["Buenos_Aires"].conexiones)
+print(nodos["Buenos_Aires"].conexiones)
 #Prueba funciona bien

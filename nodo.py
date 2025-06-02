@@ -1,7 +1,9 @@
+from validaciones import *
+
 class Nodo():
     
     def __init__(self, nombre:str):
-        Nodo.validarNombre(nombre)
+        validar_cadena(nombre)
         self.nombre=nombre
         self.conexiones=[] #lista de conexiones; se elige una lista ya que se va a almacenar un conjunto de datos que pueden variar duarnte la ejecución
                             # (se agregan conexiones cuando se lee el csv) y no se usa una pila o una cola porque no hace fakta utilizar lógicas como FIFO 
@@ -12,13 +14,6 @@ class Nodo():
     
     def __repr__(self):
         return f"{self.nombre}" #método __repr__ para modificar el comportamoiento de la función print()
-
-    @staticmethod
-    def validarNombre(nombre:str): #se valida que el nombre sea del tipo de dato correspondiente (str) y que no esté vacío
-        if not isinstance(nombre, str):
-            raise TypeError("El nombre debe ser una cadena")
-        if len(nombre)==0:
-            raise ValueError("El nombre no puede ser una cadena vacía")
         
 
 import csv
