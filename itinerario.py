@@ -86,6 +86,7 @@ class Itinerario:
             nuevo_origen = self._obtener_nombre_nodo(tramo.nodo_origen)
             if nuevo_origen != ultimo_destino:
                 print(f"Advertencia: El tramo no es continuo. Último destino: {ultimo_destino}, Nuevo origen: {nuevo_origen}")
+        #PONER RAISE NO PRINT
         
         # evito ciclos basicos (sino termino dando vueltas)
         if self._tiene_ciclo_basico(tramo):
