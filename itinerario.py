@@ -176,33 +176,33 @@ class Itinerario:
 
 
 # (bloque de prueba)
-if __name__ == "__main__":
-    print("PRUEBA DEL SISTEMA DE ITINERARIOS")
+# if __name__ == "__main__":
+#     print("PRUEBA DEL SISTEMA DE ITINERARIOS")
     
-    try:
-        # creo algunos vehiculos para probar
-        camion = Vehiculo("automotor", 80.0, 25000.0, 500.0, 2.5, 0.05)
-        tren = Vehiculo("ferroviario", 60.0, 100000.0, 1200.0, 1.8, 0.02)
+#     try:
+#         # creo algunos vehiculos para probar
+#         camion = Vehiculo("automotor", 80.0, 25000.0, 500.0, 2.5, 0.05)
+#         tren = Vehiculo("ferroviario", 60.0, 100000.0, 1200.0, 1.8, 0.02)
         
-        # y algunos nodos
-        ba = Nodo("Buenos Aires")
-        rosario = Nodo("Rosario")
-        cordoba = Nodo("Córdoba")
+#         # y algunos nodos
+#         ba = Nodo("Buenos Aires")
+#         rosario = Nodo("Rosario")
+#         cordoba = Nodo("Córdoba")
         
-        # armo un itinerario
-        itinerario = Itinerario(kpi_usado="tiempo")
+#         # armo un itinerario
+#         itinerario = Itinerario(kpi_usado="tiempo")
         
-        # agrego un par de tramos
-        tramo1 = Tramo(camion, ba, rosario, 300, 15000)
-        tramo2 = Tramo(tren, rosario, cordoba, 400, 80000)
+#         # agrego un par de tramos
+#         tramo1 = Tramo(camion, ba, rosario, 300, 15000)
+#         tramo2 = Tramo(tren, rosario, cordoba, 400, 80000)
         
-        itinerario.agregar_tramo(tramo1)
-        itinerario.agregar_tramo(tramo2)
+#         itinerario.agregar_tramo(tramo1)
+#         itinerario.agregar_tramo(tramo2)
         
-        # veo como quedo
-        print(itinerario)
+#         # veo como quedo
+#         print(itinerario)
         
-        print("\nPrueba exitosa - Sistema funcionando correctamente")
+#         print("\nPrueba exitosa - Sistema funcionando correctamente")
         
-    except Exception as e:
-        print(f"Error en la prueba: {e}")
+#     except Exception as e:
+#         print(f"Error en la prueba: {e}")
