@@ -6,7 +6,7 @@ class Nodo():
         validar_cadena(nombre)
         self.nombre=nombre
         self.conexiones=[] #lista de conexiones; se elige una lista ya que se va a almacenar un conjunto de datos que pueden variar duarnte la ejecución
-                            # (se agregan conexiones cuando se lee el csv) y no se usa una pila o una cola porque no hace fakta utilizar lógicas como FIFO 
+                            # (se agregan conexiones cuando se lee el csv) y no se usa una pila o una cola porque no hace falta utilizar lógicas como FIFO 
                             # o LIFO; por eso la lista parece ser lo más adecuado
 
     def agregarConexiones(self, conexion):
