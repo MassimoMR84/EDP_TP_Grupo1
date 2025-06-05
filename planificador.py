@@ -1,7 +1,9 @@
+from nodo import Nodo
+
 class Planificador: 
     '''
     Clase princiapal, planifica intinerarios dependiendo del KPI para solicitudes de transporte 
-    '''
+    '''   
     
     def __init__(self, red_transporte):
         '''
@@ -9,4 +11,34 @@ class Planificador:
         '''
         self.red_transporte = red_transporte
         
-    def 
+    def buscar_rutas(self, nodo_actual, destino, recorrido=None):
+        """
+        Devuelve todas las rutas posibles desde nodo_actual hasta destino
+        Cada ruta es una lista de objetos Nodo, sin repetir nodos
+        """
+        if recorrido is None:
+            recorrido = []
+        recorrido = recorrido + [nodo_actual]
+
+        if nodo_actual == destino:
+            return [recorrido]
+
+        caminos = []
+        for conexion in nodo_actual.conexiones:
+            siguiente_nodo = conexion.destino
+            if siguiente_nodo not in recorrido:
+                nuevos_caminos = self.buscar_rutas(siguiente_nodo, destino, recorrido)
+                caminos.extend(nuevos_caminos)
+        return caminos
+
+
+    
+    
+    def evaluar_ruta(ruta, peso_carga, kpi):
+        pass
+    
+    def generar_itinerario(solicitud, kpi):
+        pass
+    
+    
+    
