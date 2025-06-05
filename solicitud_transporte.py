@@ -28,7 +28,7 @@ def leer_solicitudes(file):
 
 
 if __name__ == '__main__':
-    dicc = leer_csv('solicitudes.csv')
+    dicc = leer_solicitudes('solicitudes.csv')
     for elem in dicc:
         Nuevo=SolicitudTransporte(**elem)
 
