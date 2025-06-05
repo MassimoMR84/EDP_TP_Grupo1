@@ -1,5 +1,5 @@
-from main import leer_csv
 from validaciones import validar_numero_mayor_a_cero,validar_numero_positivo
+import csv
 
 class SolicitudTransporte:
     '''Clase que representa una solicitud de carga'''
@@ -7,9 +7,9 @@ class SolicitudTransporte:
         self.id_carga=id_carga
         self.peso_kg=validar_numero_mayor_a_cero(peso_kg)
         self.origen=origen
+        if self.origen == destino:
+            raise ValueError ("No puedes transportar desde el mismo origen hacia el mismo destino")
         self.destino=destino
-
-    
 
     def __eq__(self, other):
         if not isinstance(other,SolicitudTransporte):
@@ -18,6 +18,14 @@ class SolicitudTransporte:
             return True
         else:
             return False
+        
+
+
+def leer_solicitudes(file):
+    with open(file,'r',encoding='utf-8') as archivo:
+        lector=csv.DictReader(archivo)
+        return list(lector)
+
 
 if __name__ == '__main__':
     dicc = leer_csv('solicitudes.csv')
