@@ -11,13 +11,14 @@ class Planificador:
         '''
         self.red_transporte = red_transporte
         
-    def buscar_rutas(self, nodo_actual, destino, recorrido=None):
+    def buscar_rutas(self, nodo_actual, destino, modo, recorrido=None):
         """
-        Devuelve todas las rutas posibles desde nodo_actual hasta destino
-        Cada ruta es una lista de objetos Nodo, sin repetir nodos
+        Devuelve todas las rutas posibles entre nodo_actual y destino,
+        usando solo conexiones del tipo `modo`, sin repetir nodos.
         """
         if recorrido is None:
             recorrido = []
+
         recorrido = recorrido + [nodo_actual]
 
         if nodo_actual == destino:
@@ -25,13 +26,15 @@ class Planificador:
 
         caminos = []
         for conexion in nodo_actual.conexiones:
-            siguiente_nodo = conexion.destino
-            if siguiente_nodo not in recorrido:
-                nuevos_caminos = self.buscar_rutas(siguiente_nodo, destino, recorrido)
-                caminos.extend(nuevos_caminos)
+            if conexion.tipo.lower() == modo.lower():
+                siguiente_nodo = conexion.destino
+                if siguiente_nodo not in recorrido:
+                    nuevos_caminos = self.buscar_rutas(siguiente_nodo, destino, modo, recorrido)
+                    caminos.extend(nuevos_caminos)
+
         return caminos
 
-
+    
     
     
     def evaluar_ruta(ruta, peso_carga, kpi):
