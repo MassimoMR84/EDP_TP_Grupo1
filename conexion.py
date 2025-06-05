@@ -55,10 +55,3 @@ def leer_conexiones(path, nodos: dict):
                 '''se instancia la conexión'''
                 origen.agregarConexiones(conexion)
                 '''se agrega la conexión al nodo origen'''
-
-
-nodos=leer_nodos("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/nodos.csv")
-conexiones=leer_conexiones("/Users/federicopedrotti/Desktop/Estructuras de Datos y Programación/EDP_TP_Grupo1/conexiones.csv",nodos)
-
-print(nodos["Buenos_Aires"].conexiones)
-'''Prueba funciona bien'''
