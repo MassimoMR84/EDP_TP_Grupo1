@@ -70,3 +70,19 @@ class Vehiculo:
         return costo_total    
     
    
+    
+if __name__=="__main__":
+    try: 
+        v = Vehiculo('maritimo', 30, 30, 32, 24, 12)
+        print(v)
+        
+        horas, minutos = v.calcular_tiempo_tramo(20)
+        print(f"Tiempo de viaje: {horas} horas y {minutos} minutos")
+        
+        costo = v.calcular_costo_tramo(200, 20)
+        print(f'Costo del tramo: ${costo}')
+    
+    except ValueError as e:
+        print (e)
+    except TypeError as e:
+        print(e)
