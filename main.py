@@ -7,7 +7,7 @@ def leer_csv(file):
 print(leer_csv('conexiones.csv'))
 
 
-
+'''BORRAR LO DE ABAJO (estamos probando que funcione)'''
 from nodo import Nodo
 from conexion import leer_nodos, leer_conexiones
 from red_transporte import RedTransporte
