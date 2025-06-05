@@ -47,13 +47,10 @@ def validar_division_por_cero(denominador):
 def validar_modo_de_transporte(modo_de_transporte):
     '''
     Valida que el modo de transporte sea valido 
-    (este dentro de los modos aceptados: automotor, ferroviario, aereo, maritimo)
+    (este dentro de los modos aceptados: automotor, ferroviaria, aerea, fluvial)
     '''
     #valido que sea del tipo cadena
     validar_cadena(modo_de_transporte)
     #valido que sea un modo valido
-    if modo_de_transporte.strip().lower() not in ['automotor', 'ferroviario', 'aereo', 'maritimo']:
-        raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviario, aereo o maritimo.')
-
-    
-    
+    if modo_de_transporte.strip().lower() not in ['automotor', 'ferroviaria', 'aerea', 'fluvial']:
+        raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviaria, aerea o fluvial.')
