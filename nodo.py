@@ -1,23 +1,29 @@
-from validaciones import *
+from validaciones import validar_cadena
 
 class Nodo():
-    """Clase Nodo: contiene el nombre del nodo y sus conexiones """
-    
-    def __init__(self, nombre:str):
-        validar_cadena(nombre)
-        self.nombre=nombre
-        self.conexiones:list[Nodo]=[] 
-        '''lista de conexiones; se elige una lista ya que se va a almacenar un conjunto de datos que pueden variar duarnte la ejecución
-        (se agregan conexiones cuando se lee el csv) y no se usa una pila o una cola porque no hace fakta utilizar lógicas como FIFO o 
-        LIFO; por eso la lista parece ser lo más adecuado'''
 
-    def agregarConexiones(self, conexion):
-        '''método de instancia para agregar una conexión a un nodo'''
-        self.conexiones.append(conexion)
+    def __init__(self, nombre:str):
+        self.nombre = nombre #falta validacion
+        self.conexiones=[]
+
+    def __str__(self):
+        return f"{self.nombre}"
     
     def __repr__(self):
+        return f"{self.nombre}"
+
+    def __eq__(self, otro): 
+        '''Compara si dos nodos son iguales basandose en su nombre'''
+        return isinstance(otro, Nodo) and self.nombre == otro.nombre
+
+    def __hash__(self): 
+        '''Permite que el nodo sea usado como clave en un diccionario o en un set'''
+        return hash(self.nombre)
         '''método __repr__ para modificar el comportamoiento de la función print()'''
         return f"{self.nombre}" 
+
+    def agregarConexiones(self, conexion):
+        self.conexiones.append(conexion)
         
 
 import csv

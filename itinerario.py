@@ -6,22 +6,17 @@ from vehiculos import Vehiculo
 
 class Tramo:
     """Un tramo es basicamente un pedazo del viaje completo"""
-    
-    def __init__(self, vehiculo, nodo_origen, nodo_destino, distancia, carga=0):
-        # validaciones basicas
-        if not isinstance(vehiculo, Vehiculo):
-            raise TypeError("El vehículo debe ser una instancia de la clase Vehiculo")
-        validar_numero_positivo(distancia)
-        validar_numero_positivo(carga)
+
+    def __init__(self, vehiculo: Vehiculo, origen: Nodo, destino: Nodo, distancia: float, carga: float = 0):
+        '''datos del tramo'''
+        self.vehiculo = validar_vehiculo (vehiculo)
+        self.origen = origen  
+        '''puede ser objeto Nodo o string, da igual'''
+        self.destino = destino
+        self.distancia = validar_numero_positivo(distancia)  # en km
+        self.carga = validar_numero_positivo(carga)  # en kg
         
-        # datos del tramo
-        self.vehiculo = vehiculo
-        self.nodo_origen = nodo_origen  # puede ser objeto Nodo o string, da igual
-        self.nodo_destino = nodo_destino  
-        self.distancia = distancia  # en km
-        self.carga = carga  # en kg
-        
-        # calculo automatico usando los metodos del vehiculo
+        '''calculo automatico usando los metodos del vehiculo'''
         self.tiempo = self._calcular_tiempo_decimal()
         self.costo = self._calcular_costo()
     
@@ -36,9 +31,11 @@ class Tramo:
     
     def _obtener_nombre_nodo(self, nodo):
         """saca el nombre del nodo, no importa si es objeto o string"""
-        if hasattr(nodo, 'nombre'):  # es un objeto Nodo
+        if hasattr(nodo, 'nombre'):
+            '''es un objeto Nodo'''
             return nodo.nombre
-        return str(nodo)  # es un string
+        return str(nodo)
+        '''es un string'''
     
     def obtener_tiempo_formateado(self):
         """devuelve el tiempo en formato (horas, minutos) que es mas legible"""
@@ -58,12 +55,12 @@ class Itinerario:
     """Representa todo el plan de viaje completo"""
     
     def __init__(self, kpi_usado="tiempo"):
-        # valido que el KPI sea correcto
+        '''valido que el KPI sea correcto'''
         validar_cadena(kpi_usado)
         if kpi_usado not in ["tiempo", "costo"]:
             raise ValueError("KPI debe ser 'tiempo' o 'costo'")
         
-        # inicializo todo en vacio
+        '''inicializo todo en vacio'''
         self.tramos = []
         self.costo_total = 0.0
         self.tiempo_total = 0.0
@@ -80,7 +77,7 @@ class Itinerario:
         if not isinstance(tramo, Tramo):
             raise TypeError("El tramo debe ser una instancia de la clase Tramo")
         
-        # chequeo que los tramos se conecten bien
+        '''chequeo que los tramos se conecten bien'''
         if self.tramos:
             ultimo_destino = self._obtener_nombre_nodo(self.tramos[-1].nodo_destino)
             nuevo_origen = self._obtener_nombre_nodo(tramo.nodo_origen)
@@ -88,7 +85,7 @@ class Itinerario:
                 print(f"Advertencia: El tramo no es continuo. Último destino: {ultimo_destino}, Nuevo origen: {nuevo_origen}")
         #PONER RAISE NO PRINT
         
-        # evito ciclos basicos (sino termino dando vueltas)
+        '''evito ciclos basicos (sino termino dando vueltas)'''
         if self._tiene_ciclo_basico(tramo):
             destino_nombre = self._obtener_nombre_nodo(tramo.nodo_destino)
             raise ValueError(f"Se detectó un ciclo: el nodo {destino_nombre} ya fue visitado")
@@ -100,15 +97,15 @@ class Itinerario:
         """chequea que no vuelva a un nodo que ya visite"""
         nodos_visitados = set()
         
-        # junto todos los nodos que ya pase
+        '''junto todos los nodos que ya pase'''
         for tramo in self.tramos:
             nodos_visitados.add(self._obtener_nombre_nodo(tramo.nodo_origen))
         
-        # si ya tengo tramos, agrego el ultimo destino tambien
+        '''si ya tengo tramos, agrego el ultimo destino tambien'''
         if self.tramos:
             nodos_visitados.add(self._obtener_nombre_nodo(self.tramos[-1].nodo_destino))
         
-        # veo si el nuevo destino ya lo visite antes
+        '''veo si el nuevo destino ya lo visite antes'''
         nuevo_destino = self._obtener_nombre_nodo(nuevo_tramo.nodo_destino)
         return nuevo_destino in nodos_visitados
     
@@ -160,7 +157,7 @@ class Itinerario:
         resultado += f"\nDistancia total: {self.obtener_distancia_total():.1f} km"
         resultado += f"\nCarga total: {self.obtener_carga_total():.1f} kg"
         
-        # formateo el tiempo para que se vea bien
+        '''formateo el tiempo para que se vea bien'''
         horas_totales = int(self.tiempo_total)
         minutos_totales = int((self.tiempo_total - horas_totales) * 60)
         resultado += f"\nTiempo total: {horas_totales}h {minutos_totales}min"

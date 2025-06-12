@@ -1,7 +1,21 @@
-import csv
-def leer_csv(file):
-    with open(file,'r',encoding='utf-8') as archivo:
-        lector=csv.DictReader(archivo)
-        return list(lector)
+from SistemaTransporte import SistemaTransporte
+from nodo import *
+from conexion import *
 
-print(leer_csv('conexiones.csv'))
+def main():
+    sistema = SistemaTransporte()
+    # Leer nodos
+    sistema.lector_csv('nodos.csv', 'nodo')
+    # Leer conexiones
+    sistema.lector_csv('conexiones.csv', 'conexion')
+    # Leer solicitudes
+    sistema.lector_csv('solicitudes.csv', 'solicitudes')
+    
+    # Imprimir el sistema para verificar los datos cargados
+    print(sistema)
+
+if __name__ == '__main__':
+    #main()
+    nodos=leer_nodos("nodos.csv")
+    conexiones= leer_conexiones("conexiones.csv", nodos)
+    print(conexiones)

@@ -1,28 +1,41 @@
-from validaciones import *
+from validaciones import validarNodo, validar_modo_de_transporte, validar_numero_mayor_a_cero
 from nodo import *
+from SistemaTransporte import *
+import csv
 
 class Conexion:
     '''Clase Conexión: contiene el nodo origen, el nodo destino, la distancia entre ellos, la restricción (si la hay) 
     y el valor de la restricción (si corresponde)'''
 
+    
     def __init__(self, origen: Nodo, destino: Nodo, tipo: str, distancia: int, restriccion=None, valorRestriccion=None):
-        Conexion.validarNodo(origen)
-        self.origen=origen
-        Conexion.validarNodo(destino)
-        self.destino=destino
-        validar_cadena(tipo)
-        validar_modo_de_transporte(tipo)
-        self.tipo=tipo
-        validar_numero_mayor_a_cero(distancia)
-        self.distancia=distancia
-        self.restriccion=restriccion
-        self.valorRestriccion=valorRestriccion
+        self.origen = origen
+        self.destino = destino #FALTAN VALIDACIONES
+        self.tipo = tipo
+        self.distancia = distancia
+        self.restriccion = restriccion
+        self.valorRestriccion = valorRestriccion
+
+    def __str__ (self):
+        base = f"Conexión de {self.origen} a {self.destino} ({self.tipo}): {self.distancia} km"
+        if self.restriccion:
+            base += f" | Restricción: {self.restriccion} = {self.valorRestriccion}"
+        return base
 
     def __repr__(self):
-        '''método __repr__ para modificar el comportamoiento de la función print()'''
-        return f"Origen: {self.origen}\nDestino: {self.destino}\nTipo: {self.tipo}\nDistancia: {self.distancia}\nRestricción: {self.restriccion}\nValor restrictivo: {self.valorRestriccion}\n"
+        return f"{self.origen}, {self.destino}, {self.tipo}, {self.distancia}, {self.restriccion}, {self.valorRestriccion}"
 
+    def aplica_restriccion(self, vehiculo): 
+        '''Verifica si un vehículo cumple con las restricciones de la conexión'''
+        if not self.restriccion:
+            return True
+        
+        atributo = getattr(vehiculo, self.restriccion, None)
+        if atributo is None:
+            return False
 
+        return atributo >= float(self.valorRestriccion)
+                
     @staticmethod
     def validarNodo(nodo):
         '''se valida que tanto el origen como el destino sean objetos de tipo Nodo'''
