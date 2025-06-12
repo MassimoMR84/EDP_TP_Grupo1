@@ -1,30 +1,33 @@
-'''========== Validaciones de datos =========='''
-
-def validar_numero(dato): 
+def validar_numero(dato):
     '''
     Valida que el dato sea un número (int o float)
     '''
-    if not dato.isdigit():
-        raise TypeError('Tipo de dato no valido. Debe ser de tipo int')
-    return int (dato)
+    if not isinstance(dato, (int, float)):
+        raise TypeError('Tipo de dato no valido. Debe ser de tipo int o float')
+    return dato
 
-def validar_numero_positivo(dato): 
+
+def validar_numero_positivo(dato):
     '''
     Valida que un numero sea positivo (mayor o igual a cero)
     '''
-    if validar_numero(dato) < 0:
+    validar_numero(dato)
+    if dato < 0:
         raise ValueError('Tipo de dato no valido. Debe ser un numero positivo.')
     return dato  
 
-def validar_numero_mayor_a_cero(dato): 
+
+def validar_numero_mayor_a_cero(dato):
     '''
     Valida que un numero sea estrictamente mayor a cero
     '''
-    if validar_numero_positivo(dato) == 0:
+    validar_numero_positivo(dato)
+    if dato == 0:
         raise ValueError('Numero debe ser estrictamente mayor a cero')
     return dato
 
-def validar_cadena(dato): 
+
+def validar_cadena(dato):
     '''
     Valida que el dato sea una cadena de texto str
     '''
@@ -32,23 +35,27 @@ def validar_cadena(dato):
         raise TypeError('Tipo de dato no valido. Debe ser una cadena de texto.')
     return dato
 
+
 def validar_division_por_cero(denominador):
     '''
     Lanza un error si el denominador de una division es cero
     '''
-    if validar_numero_positivo(denominador) == 0:
-        raise ValueError('No se puede dividir por 0')
+    validar_numero_mayor_a_cero(denominador) 
     return denominador
+
 
 '''========== Validaciones de clase Vehiculos =========='''
 
-def validar_modo_de_transporte(modo_de_transporte): 
+
+def validar_modo_de_transporte(modo_de_transporte):
     '''
     Valida que el modo de transporte sea automotor, ferroviaria, aerea, fluvial
     '''
-    if validar_cadena(modo_de_transporte).strip().lower() not in ['automotor', 'ferroviaria', 'aerea', 'fluvial']:
-        raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviaria, aerea o fluvial.')
+    modo = validar_cadena(modo_de_transporte)
+    if modo.strip().lower() not in ['automotor', 'ferroviaria', 'aerea', 'fluvial']:
+        raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviaria, aereo o fluvial.')
     return modo_de_transporte.strip().lower()
+
 
 def validar_vehiculo(vehiculo): 
     '''
