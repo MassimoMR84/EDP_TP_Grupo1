@@ -70,82 +70,99 @@ class Vehiculo:
     
 class Tren(Vehiculo):
     def __init__(self):
-        super().__init__(velocidad_nominal = 100, 
+        super().__init__(velocidad_nominal = 100,
                          capacidad_de_carga = 150000,
-                         costo_fijo_uso = 100, 
-                         costo_km_recorrido = None, 
+                         costo_fijo_uso = 100,
+                         costo_km_recorrido = 0, #valor 0 temporario
                          costo_kg_transportado = 3)        
         self.modo_de_transporte = 'ferroviaria'
    
-    def calcular_costo_tramo(self, distancia, carga): 
+    def calcular_costo_tramo(self, distancia, carga):
         # Validaciones
         validar_numero_positivo(distancia)
         validar_numero_positivo(carga)    
-        
         if distancia < 20:
-            costo_km_recorrido = 20
+            self.costo_km_recorrido = 20
         else:
-            costo_km_recorrido = 15
-        
-        return costo_km_recorrido
-        
-        
-class Auto(Vehiculo):
+            self.costo_km_recorrido = 15      
+        return super().calcular_costo_tramo(distancia, carga)
+       
+       
+class Camion(Vehiculo):
     def __init__(self):
-        super().__init__(velocidad_nominal = 80, 
+        super().__init__(velocidad_nominal = 80,
                          capacidad_de_carga = 30000,
-                         costo_fijo_uso = 30, 
-                         costo_km_recorrido = 5, 
-                         costo_kg_transportado = None)        
+                         costo_fijo_uso = 30,
+                         costo_km_recorrido = 5,
+                         costo_kg_transportado = 0)  #valor 0 temporario      
         self.modo_de_transporte = 'automotor'    
-        
-        
+       
+    def calcular_costo_tramo(self, distancia, carga):
+        # Validaciones
+        validar_numero_positivo(distancia)
+        validar_numero_positivo(carga)    
+        if carga < 15000:
+            self.costo_kg_transportado = 1
+        else:
+            self.costo_kg_transportado = 2    
+        return super().calcular_costo_tramo(distancia, carga)
 
 
 class Barco(Vehiculo):
-    def __init__(self):
-        super().__init__(velocidad_nominal = 40, 
+    def __init__(self, tipo = 'fluvial'):
+        if tipo == 'fluvial':
+            tasa = 500
+        elif tipo == 'maritimo':
+            tasa = 1500
+        super().__init__(velocidad_nominal = 40,
                          capacidad_de_carga = 100000,
-                         costo_fijo_uso = None, 
-                         costo_km_recorrido = 15, 
+                         costo_fijo_uso = tasa,
+                         costo_km_recorrido = 15,
                          costo_kg_transportado = 2)        
-        self.modo_de_transporte = 'fluvial'
+        self.modo_de_transporte = tipo
+
 
 class Avion(Vehiculo):
-    def __init__(self):
-        super().__init__(velocidad_nominal = None, 
+    def __init__(self, mal_tiempo = False):
+        if mal_tiempo == False:
+            velocidad = 600
+        else:
+            velocidad = 400
+        super().__init__(velocidad_nominal = velocidad,
                          capacidad_de_carga = 5000,
-                         costo_fijo_uso = 750, 
-                         costo_km_recorrido = 40, 
+                         costo_fijo_uso = 750,
+                         costo_km_recorrido = 40,
                          costo_kg_transportado = 10)        
         self.modo_de_transporte = 'aereo'
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-  
-'''Ejemplo de uso'''
+ 
+ 
+ 
+# Bloque de prueba completo
 if __name__ == "__main__":
-    try:
-        v = Vehiculo('fluvial', 30, 30, 32, 24, 12)
-        print(v)
 
-        horas, minutos = v.calcular_tiempo_tramo(20)
-        print(f"Tiempo de viaje: {horas} horas y {minutos} minutos")
-        
-        costo = v.calcular_costo_tramo(200, 20)
-        print(f'Costo del tramo: ${costo}')
+    try:
+        camion = Camion()
+        print("--- AUTO ---")
+        print(camion)
+        print("Costo para 75.000 kg y 100 km:", camion.calcular_costo_tramo(100, 75000))
+
+
+        tren = Tren()
+        print("\n--- TREN ---")
+        print(tren)
+        print("Costo para 300.000 kg y 250 km:", tren.calcular_costo_tramo(250, 300000))
+
+
+        barco = Barco('maritimo')
+        print("\n--- BARCO ---")
+        print(barco)
+        print("Costo para 200.000 kg y 500 km:", barco.calcular_costo_tramo(500, 200000))
+
+
+        avion = Avion(mal_tiempo=True)
+        print("\n--- AVION ---")
+        print(avion)
+        print("Costo para 8.000 kg y 300 km:", avion.calcular_costo_tramo(300, 8000))
 
     except (ValueError, TypeError) as e:
         print(e)
