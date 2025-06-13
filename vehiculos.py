@@ -79,7 +79,7 @@ class Tren(Vehiculo):
         super().__init__(velocidad_nominal = 100,
                          capacidad_de_carga = 150000,
                          costo_fijo_uso = 100,
-                         costo_km_recorrido = 0, #valor 0 temporario
+                         costo_km_recorrido = 20, #valor 20 arbitrario (puede cambiar dsps)
                          costo_kg_transportado = 3)        
         self.modo_de_transporte = 'ferroviaria'
    
@@ -100,7 +100,7 @@ class Camion(Vehiculo):
                          capacidad_de_carga = 30000,
                          costo_fijo_uso = 30,
                          costo_km_recorrido = 5,
-                         costo_kg_transportado = 0)  #valor 0 temporario      
+                         costo_kg_transportado = 1)  #valor 1 arbitrario (puede cambiar dsps)      
         self.modo_de_transporte = 'automotor'    
        
     def calcular_costo_tramo(self, distancia, carga):
@@ -136,10 +136,10 @@ class Barco(Vehiculo):
     def __init__(self):
         super().__init__(velocidad_nominal = 40,
                          capacidad_de_carga = 100000,
-                         costo_fijo_uso = 0, #se define despues
+                         costo_fijo_uso = 1500, #valor arbitrario, puede cmabiar dsps
                          costo_km_recorrido = 15,
                          costo_kg_transportado = 2)        
-        self.modo_de_transporte = None #se evalua despues
+        self.modo_de_transporte = 'fluvial' #se pone como default y despues se cambia si hace falta
     
     def calcular_costo_tramo(self, distancia, carga, conexion=None):
         validar_numero_positivo(distancia)
@@ -162,7 +162,7 @@ class Barco(Vehiculo):
 
 class Avion(Vehiculo):
     def __init__(self):
-        super().__init__(velocidad_nominal = 600, #si hya mal tiempo se cambia despues
+        super().__init__(velocidad_nominal = 600, #si hay mal tiempo se cambia despues
                          capacidad_de_carga = 5000,
                          costo_fijo_uso = 750,
                          costo_km_recorrido = 40,
@@ -185,34 +185,43 @@ class Avion(Vehiculo):
         return horas_a_hs_y_min(tiempo)
 
  
-# Bloque de prueba completo
+
+
 if __name__ == "__main__":
+        from nodo import Nodo
+        from conexion import Conexion
+        # Simular nodos y conexiones
+        origen = Nodo("Zarate")
+        destino = Nodo("Buenos Aires")
 
-    try:
+        conexion_camion = Conexion(origen, destino, tipo="automotor", distancia=100,
+                                   restriccion="peso_max", valorRestriccion="25000")
+
+        conexion_avion = Conexion(origen, destino, tipo="aerea", distancia=300,
+                                  restriccion="prob_mal_tiempo", valorRestriccion="malo")
+
+        conexion_barco = Conexion(origen, destino, tipo="maritimo", distancia=500)
+
+        print("\n--- CAMION ---")
         camion = Camion()
-        print("--- AUTO ---")
         print(camion)
+        print("¿Puede transportar por conexión?:", camion.puede_transportar(conexion_camion))
         print("Costo para 75.000 kg y 100 km:", camion.calcular_costo_tramo(100, 75000))
-        transportar_camion = camion.puede_transportar(800000)
-        print('El camion puede transportar?', transportar_camion)
 
-        tren = Tren()
         print("\n--- TREN ---")
+        tren = Tren()
         print(tren)
         print("Costo para 300.000 kg y 250 km:", tren.calcular_costo_tramo(250, 300000))
-        transportar_tren = camion.puede_transportar()
-        print('El tren puede transportar?', transportar_tren)
 
-        barco = Barco('maritimo')
         print("\n--- BARCO ---")
+        barco = Barco()
         print(barco)
-        print("Costo para 200.000 kg y 500 km:", barco.calcular_costo_tramo(500, 200000))
+        print("Costo para 200.000 kg y 500 km:", barco.calcular_costo_tramo(500, 200000, conexion=conexion_barco))
 
-
-        avion = Avion(mal_tiempo=True)
         print("\n--- AVION ---")
+        avion = Avion()
         print(avion)
-        print("Costo para 8.000 kg y 300 km:", avion.calcular_costo_tramo(300, 8000))
+        tiempo = avion.calcular_tiempo_tramo(300, conexion=conexion_avion)
+        print("Tiempo de vuelo con mal clima (300 km):", tiempo)
 
-    except (ValueError, TypeError) as e:
-        print(e)
+ 
