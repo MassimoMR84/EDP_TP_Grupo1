@@ -68,6 +68,12 @@ class Vehiculo:
      
         return (costo_total)
     
+    def puede_transportar(self):
+        '''
+        Se asume que todos los vehiculos pueden transportar.
+        En las subclases necesarias se tiene en cuenta si hay restricciones especificas'''
+        return True
+    
 class Tren(Vehiculo):
     def __init__(self):
         super().__init__(velocidad_nominal = 100,
@@ -107,7 +113,17 @@ class Camion(Vehiculo):
             self.costo_kg_transportado = 2    
         return super().calcular_costo_tramo(distancia, carga)
 
-
+    def puede_transportar(self, restriccion_peso_max = None):
+        '''
+        Evalua si la capacidad del camion no supera el peso meximo permitido.
+        Devuelve True si el camion puede circular por el tramo
+        '''
+        if restriccion_peso_max is not None and self.capacidad_de_carga > restriccion_peso_max:
+            return False
+        return True
+        
+    
+    
 class Barco(Vehiculo):
     def __init__(self, tipo = 'fluvial'):
         if tipo == 'fluvial':
@@ -145,13 +161,17 @@ if __name__ == "__main__":
         print("--- AUTO ---")
         print(camion)
         print("Costo para 75.000 kg y 100 km:", camion.calcular_costo_tramo(100, 75000))
-
+        transportar_camion = camion.puede_transportar(800000)
+        print('El camion puede transportar?', transportar_camion)
+        
+        
 
         tren = Tren()
         print("\n--- TREN ---")
         print(tren)
         print("Costo para 300.000 kg y 250 km:", tren.calcular_costo_tramo(250, 300000))
-
+        transportar_tren = camion.puede_transportar()
+        print('El tren puede transportar?', transportar_tren)
 
         barco = Barco('maritimo')
         print("\n--- BARCO ---")
