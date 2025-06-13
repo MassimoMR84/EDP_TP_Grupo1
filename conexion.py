@@ -79,6 +79,6 @@ if __name__ == "__main__":
     nodos=leer_nodos("nodos.csv")
     print(nodos)
 
-    leer_conexiones("conexiones.csv", nodos)
+    procesar_conexiones("conexiones.csv", nodos)
     print(nodos["Buenos_Aires"].conexiones)
     '''Clases nodo y conexión funcionan OK'''
