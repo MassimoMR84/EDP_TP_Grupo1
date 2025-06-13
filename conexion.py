@@ -9,10 +9,12 @@ class Conexion:
 
     
     def __init__(self, origen: Nodo, destino: Nodo, tipo: str, distancia: int, restriccion=None, valorRestriccion=None):
+        Conexion.validarNodo(origen)
         self.origen = origen
+        Conexion.validarNodo(destino)
         self.destino = destino #FALTAN VALIDACIONES
-        self.tipo = tipo
-        self.distancia = distancia
+        self.tipo = validar_modo_de_transporte(tipo)
+        self.distancia = validar_numero_mayor_a_cero(distancia)
         self.restriccion = restriccion
         self.valorRestriccion = valorRestriccion
 
@@ -23,7 +25,10 @@ class Conexion:
         return base
 
     def __repr__(self):
-        return f"{self.origen}, {self.destino}, {self.tipo}, {self.distancia}, {self.restriccion}, {self.valorRestriccion}"
+        if self.restriccion is None:
+            return f"Origen:{self.origen}\nDestino:{self.destino}\nModo de transporte: {self.tipo}\nDistancia: {self.distancia}\nNo hay restricciones en esta conexion\n\n"
+        else:
+            return f"Origen:{self.origen}\nDestino:{self.destino}\nModo de transporte: {self.tipo}\nDistancia: {self.distancia}\n Restricción:{self.restriccion}\nValor restrictivo: {self.valorRestriccion}\n\n"
 
     def aplica_restriccion(self, vehiculo): 
         '''Verifica si un vehículo cumple con las restricciones de la conexión'''
@@ -68,3 +73,13 @@ def leer_conexiones(path, nodos: dict):
                 '''se instancia la conexión'''
                 origen.agregarConexiones(conexion)
                 '''se agrega la conexión al nodo origen'''
+
+
+'''Prueba de funcionamiento local'''
+if __name__ == "__main__":
+    nodos=leer_nodos("nodos.csv")
+    print(nodos)
+
+    leer_conexiones("conexiones.csv", nodos)
+    print(nodos["Buenos_Aires"].conexiones)
+    '''Clases nodo y conexión funcionan OK'''

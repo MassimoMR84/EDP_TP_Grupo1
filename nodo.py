@@ -3,7 +3,7 @@ from validaciones import validar_cadena
 class Nodo():
 
     def __init__(self, nombre:str):
-        self.nombre = nombre #falta validacion
+        self.nombre = validar_cadena(nombre) #falta validacion
         self.conexiones=[]
 
     def __str__(self):
@@ -19,8 +19,6 @@ class Nodo():
     def __hash__(self): 
         '''Permite que el nodo sea usado como clave en un diccionario o en un set'''
         return hash(self.nombre)
-        '''método __repr__ para modificar el comportamoiento de la función print()'''
-        return f"{self.nombre}" 
 
     def agregarConexiones(self, conexion):
         self.conexiones.append(conexion)
