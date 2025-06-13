@@ -113,45 +113,77 @@ class Camion(Vehiculo):
             self.costo_kg_transportado = 2    
         return super().calcular_costo_tramo(distancia, carga)
 
-    def puede_transportar(self, restriccion_peso_max = None):
+    def puede_transportar(self, conexion):
         '''
         Evalua si la capacidad del camion no supera el peso meximo permitido.
         Devuelve True si el camion puede circular por el tramo
         '''
-        if restriccion_peso_max is not None and self.capacidad_de_carga > restriccion_peso_max:
-            return False
-        return True
+        from conexion import Conexion
         
-    
+        if not isinstance(conexion, Conexion):
+            raise TypeError('Tipo de dato invalido. Debe ser una conexion')
+        
+        if conexion.restriccion == "peso_max":
+            try:
+                peso_maximo = float(conexion.valorRestriccion)
+                return self.capacidad_de_carga <= peso_maximo
+            except (TypeError, ValueError) as e:
+                print (e)
+        else:
+            return True
     
 class Barco(Vehiculo):
-    def __init__(self, tipo = 'fluvial'):
-        if tipo == 'fluvial':
-            tasa = 500
-        elif tipo == 'maritimo':
-            tasa = 1500
+    def __init__(self):
         super().__init__(velocidad_nominal = 40,
                          capacidad_de_carga = 100000,
-                         costo_fijo_uso = tasa,
+                         costo_fijo_uso = 0, #se define despues
                          costo_km_recorrido = 15,
                          costo_kg_transportado = 2)        
-        self.modo_de_transporte = tipo
+        self.modo_de_transporte = None #se evalua despues
+    
+    def calcular_costo_tramo(self, distancia, carga, conexion=None):
+        validar_numero_positivo(distancia)
+        validar_numero_positivo(carga)
+        from conexion import Conexion
+        
+        if not isinstance(conexion, Conexion):
+            raise TypeError('Tipo de dato invalido. Debe ser una conexion')
+        
+        if conexion.tipo == 'maritimo':
+            self.costo_fijo_uso = 1500
+            self.modo_de_transporte = 'maritimo'
+        else:
+            self.costo_fijo_uso = 500
+            self.modo_de_transporte = 'fluvial'
+
+        return super().calcular_costo_tramo(distancia, carga)
+
 
 
 class Avion(Vehiculo):
-    def __init__(self, mal_tiempo = False):
-        if mal_tiempo == False:
-            velocidad = 600
-        else:
-            velocidad = 400
-        super().__init__(velocidad_nominal = velocidad,
+    def __init__(self):
+        super().__init__(velocidad_nominal = 600, #si hya mal tiempo se cambia despues
                          capacidad_de_carga = 5000,
                          costo_fijo_uso = 750,
                          costo_km_recorrido = 40,
                          costo_kg_transportado = 10)        
         self.modo_de_transporte = 'aereo'
  
- 
+    def calcular_tiempo_tramo(self, distancia, conexion=None):
+        validar_numero_positivo(distancia)
+        from conexion import Conexion
+        
+        if not isinstance(conexion, Conexion):
+            raise TypeError('Tipo de dato invalido. Debe ser una conexion')
+        
+        velocidad = self.velocidad_nominal
+        if conexion.restriccion == "prob_mal_tiempo":
+            velocidad = 400  # velocidad reducida por mal clima
+
+        validar_division_por_cero(velocidad)
+        tiempo = distancia / velocidad
+        return horas_a_hs_y_min(tiempo)
+
  
 # Bloque de prueba completo
 if __name__ == "__main__":
@@ -163,8 +195,6 @@ if __name__ == "__main__":
         print("Costo para 75.000 kg y 100 km:", camion.calcular_costo_tramo(100, 75000))
         transportar_camion = camion.puede_transportar(800000)
         print('El camion puede transportar?', transportar_camion)
-        
-        
 
         tren = Tren()
         print("\n--- TREN ---")
