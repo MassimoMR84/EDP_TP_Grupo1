@@ -24,7 +24,7 @@ class Conexion:
             base += f" | Restricción: {self.restriccion} = {self.valorRestriccion}"
         return base
 
-    def __repr__(self):
+    def __repr__(self): #! Poner mas corto e intuitivo
         if self.restriccion is None:
             return f"Origen:{self.origen}\nDestino:{self.destino}\nModo de transporte: {self.tipo}\nDistancia: {self.distancia}\nNo hay restricciones en esta conexion\n\n"
         else:
@@ -42,13 +42,13 @@ class Conexion:
         return atributo >= float(self.valorRestriccion)
                 
     @staticmethod
-    def validarNodo(nodo):
+    def validarNodo(nodo):  #! Moverlo a validaciones y poner el import
         '''se valida que tanto el origen como el destino sean objetos de tipo Nodo'''
         if not isinstance(nodo, Nodo):
             raise TypeError("El origen y destino deben ser objetos de tipo Nodo")
         
         
-def leer_conexiones(path, nodos: dict): 
+def leer_conexiones(path, nodos: dict): #! Juntar los lectores en un solo archivo y en una funcion
     '''función para leer las conexiones del csv, se le pasan como parámetros el path del archivo y el diccionario de nodos 
     obtenido con la función leer_nodos'''
     with open(path, newline='', encoding='utf-8') as f: 

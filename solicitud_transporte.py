@@ -21,6 +21,9 @@ class SolicitudTransporte:
         else:
             return False
 
+    #! Falta el lector del csv
+    
+    
 # Ejemplo de uso:
 if __name__ == '__main__':
     try:

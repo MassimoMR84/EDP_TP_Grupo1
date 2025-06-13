@@ -6,7 +6,7 @@ class Nodo():
         self.nombre = validar_cadena(nombre) #falta validacion
         self.conexiones=[]
 
-    def __str__(self):
+    def __str__(self):  #! Falta explicacion 
         return f"{self.nombre}"
     
     def __repr__(self):
@@ -26,7 +26,7 @@ class Nodo():
 
 import csv
 
-def leer_nodos(path):
+def leer_nodos(path):   #! Juntar los lectores en un solo archivo y en una funcion
     nodos = {} 
     '''diccionario para almacenar los datos: key: nombre del nodo--> value: objeto nodo con ese nombre'''
     with open(path, newline='', encoding='utf-8') as f: 
