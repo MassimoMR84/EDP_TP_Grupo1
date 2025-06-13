@@ -1,4 +1,4 @@
-from validaciones import validarNodo, validar_modo_de_transporte, validar_numero_mayor_a_cero
+from validaciones import *
 from nodo import *
 from SistemaTransporte import *
 import csv
@@ -9,10 +9,10 @@ class Conexion:
 
     
     def __init__(self, origen: Nodo, destino: Nodo, tipo: str, distancia: int, restriccion=None, valorRestriccion=None):
-        Conexion.validarNodo(origen)
+        validarNodo(origen)
         self.origen = origen
-        Conexion.validarNodo(destino)
-        self.destino = destino #FALTAN VALIDACIONES
+        validarNodo(destino)
+        self.destino = destino
         self.tipo = validar_modo_de_transporte(tipo)
         self.distancia = validar_numero_mayor_a_cero(distancia)
         self.restriccion = restriccion
@@ -40,16 +40,10 @@ class Conexion:
             return False
 
         return atributo >= float(self.valorRestriccion)
-                
-    @staticmethod
-    def validarNodo(nodo):  #! Moverlo a validaciones y poner el import
-        '''se valida que tanto el origen como el destino sean objetos de tipo Nodo'''
-        if not isinstance(nodo, Nodo):
-            raise TypeError("El origen y destino deben ser objetos de tipo Nodo")
         
         
-def leer_conexiones(path, nodos: dict): #! Juntar los lectores en un solo archivo y en una funcion
-    '''función para leer las conexiones del csv, se le pasan como parámetros el path del archivo y el diccionario de nodos 
+def procesar_conexiones(path, nodos: dict): #! Juntar los lectores en un solo archivo y en una funcion
+    '''función para leer las conexiones del csv, instanciar los objetos conexión a partir de eso y agregarlos a los nodos correspondientes; se le pasan como parámetros el path del archivo y el diccionario de nodos 
     obtenido con la función leer_nodos'''
     with open(path, newline='', encoding='utf-8') as f: 
         '''se abre el csv de nodos, urf-8 para leer el archivo correctamente'''
@@ -71,8 +65,13 @@ def leer_conexiones(path, nodos: dict): #! Juntar los lectores en un solo archiv
                 '''si el origen y el destino realmente son nodos y existen'''
                 conexion = Conexion(origen, destino, tipo, distancia, restriccion, valor)
                 '''se instancia la conexión'''
-                origen.agregarConexiones(conexion)
-                '''se agrega la conexión al nodo origen'''
+                if isinstance(conexion, Conexion):
+                    '''se chequea que la conexión realmente sea un objeto de dicha clase'''
+                    origen.agregarConexiones(conexion)
+                    '''se agrega la conexión al nodo origen'''
+                else:
+                    raise TypeError("Las conexiones no se pudieron agregar a los nodos correspondientes")
+
 
 
 '''Prueba de funcionamiento local'''
