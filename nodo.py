@@ -5,6 +5,7 @@ class Nodo():
     def __init__(self, nombre:str):
         self.nombre = validar_cadena(nombre) #falta validacion
         self.conexiones=[]
+        '''Las conexiones de un nodo serán aquellos objetos conexión que tengan a ese nodo como origen'''
 
     def __str__(self):  #! Falta explicacion 
         return f"{self.nombre}"
