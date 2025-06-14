@@ -9,7 +9,7 @@ class Tramo:
 
     def __init__(self, vehiculo: Vehiculo, origen: Nodo, destino: Nodo, distancia: float, carga: float = 0):
         '''datos del tramo'''
-        self.vehiculo = validar_vehiculo (vehiculo)
+        self.vehiculo = validar_vehiculo(vehiculo)
         self.origen = origen  
         '''puede ser objeto Nodo o string, da igual'''
         self.destino = destino

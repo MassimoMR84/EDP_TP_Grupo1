@@ -14,8 +14,7 @@ def main():
     # Imprimir el sistema para verificar los datos cargados
     print(sistema)
 
-if __name__ == '__main__':
-    #main()
-    nodos=leer_nodos("nodos.csv")
-    conexiones= leer_conexiones("conexiones.csv", nodos)
-    print(conexiones)
+
+
+#inicializamos red de transporte y probamos todo
+#NADA DE LOGICA SOLO EJECUTA

@@ -9,8 +9,8 @@ class RedTransporte:
     '''
     def __init__(self):
         self.nodos = {}
-        self.conexiones = [] # podria ser un set? 
-        self.vehiculos = []
+        self.conexiones = [] # podria ser un set? IAN DICE Q NO USARIA SET
+        self.vehiculos = [] #no hace falta, esta dentro de conexiones
     
     def agregar_nodo(self,nodo):
         if not isinstance(nodo,Nodo):

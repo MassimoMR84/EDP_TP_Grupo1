@@ -2,6 +2,11 @@ from validaciones import *
 from nodo import Nodo
 import csv
 
+#que la solicitud guarde el itinerario y en la red de tansporte se guardan las solicitudes
+#red de trasnporte es nuestro central: guarda todo (nodos, conexiones, solicitudes)
+#conexiones guardan los vehiculos
+#red de trasnporte interactua con los graficos
+
 class SolicitudTransporte:
     def __init__(self, id_carga: str, peso_kg: float, origen: Nodo, destino: Nodo):
         self.id_carga = validar_cadena (id_carga)

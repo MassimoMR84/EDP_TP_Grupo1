@@ -7,6 +7,7 @@ class Nodo():
     def __init__(self, nombre:str):
         self.nombre = validar_cadena(nombre) #falta validacion
         self.conexiones=[]
+        #FALTA VALIDAR Q NO SE REPITAN LAS CONEXIONES (puede ser un set y hasheas la conexion)
         '''Las conexiones de un nodo serán aquellos objetos conexión que tengan a ese nodo como origen'''
 
     def __str__(self):  #! Falta explicacion 

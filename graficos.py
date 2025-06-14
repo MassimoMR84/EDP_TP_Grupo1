@@ -25,3 +25,6 @@ plt.xlabel('Caminos')
 plt.ylabel('Costos')
 plt.bar(caminos,costos,color='green', width=0.5)
 plt.show()
+
+
+#CONVERITR A FUNCIONES
