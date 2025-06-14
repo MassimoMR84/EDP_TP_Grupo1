@@ -1,5 +1,7 @@
 from validaciones import *
 from nodo import Nodo
+import csv
+
 class SolicitudTransporte:
     def __init__(self, id_carga: str, peso_kg: float, origen: Nodo, destino: Nodo):
         self.id_carga = validar_cadena (id_carga)
@@ -20,8 +22,12 @@ class SolicitudTransporte:
             return True
         else:
             return False
-
-    #! Falta el lector del csv
+        
+    def leer_solicitudes(file):
+        with open(file,'r',encoding='utf-8') as archivo:
+            lector=csv.DictReader(archivo)
+            return list(lector)
+    
     
     
 # Ejemplo de uso:
