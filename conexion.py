@@ -25,6 +25,13 @@ class Conexion:
         else:
             return f"Origen:{self.origen}\nDestino:{self.destino}\nModo de transporte: {self.tipo}\nDistancia: {self.distancia}\n Restricción:{self.restriccion}\nValor restrictivo: {self.valorRestriccion}\n\n"
 
+    def __eq__ (self, otra_conexion):
+        '''Compara dos conexiones para ver si son iguales'''
+        return (isinstance(otra_conexion, Conexion) 
+                and self.origen == otra_conexion.origen 
+                and self.destino == otra_conexion.destino 
+                and self.tipo == otra_conexion.tipo)
+
     def aplica_restriccion(self, vehiculo): 
         '''Verifica si un vehículo cumple con las restricciones de la conexión'''
         if not self.restriccion:
