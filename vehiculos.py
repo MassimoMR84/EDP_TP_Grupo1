@@ -1,5 +1,6 @@
 from validaciones import *
 from funciones import *
+from random import random
 
 class Vehiculo:
     '''
@@ -30,11 +31,14 @@ class Vehiculo:
                 f"Costo por km recorrido: ${self.costo_km_recorrido}\n"
                 f"Costo por kg transportado: ${self.costo_kg_transportado}")
         
+    def getVelocidad(self):
+        return self.velocidad_nominal
+        
     def calcular_tiempo_tramo(self, distancia): 
         '''
         Calcula el tiempo que tarda el vehiculo en recorrer una distancia dada
         '''
-        velocidad = self.velocidad_nominal
+        velocidad = self.getVelocidad()
         validar_numero_positivo(distancia)
         validar_division_por_cero(velocidad)
         tiempo = distancia/velocidad
@@ -113,12 +117,13 @@ class Camion(Vehiculo):
             self.costo_kg_transportado = 2    
         return super().calcular_costo_tramo(distancia, carga)
 
-    def puede_transportar(self, conexion):
-        '''
-        Evalua si la capacidad del camion no supera el peso meximo permitido.
-        Devuelve True si el camion puede circular por el tramo
-        '''
-        from conexion import Conexion
+    '''
+    def puede_transportar(self, conexion): #PASAR A CONEXION (pasa cm atributo cantiad d kilos q se estan pasando)
+        
+        #Evalua si la capacidad del camion no supera el peso meximo permitido.
+        #Devuelve True si el camion puede circular por el tramo
+       
+        from conexion import Conexion #lo importo adentro xq me hace ciruclar sino (MIRAR)
         
         if not isinstance(conexion, Conexion):
             raise TypeError('Tipo de dato invalido. Debe ser una conexion')
@@ -131,59 +136,40 @@ class Camion(Vehiculo):
                 print (e)
         else:
             return True
+    '''
+    
     
 class Barco(Vehiculo):
-    def __init__(self):
+    def __init__(self, modo_de_transporte):
+        if modo_de_transporte == 'fluvial':
+            costo = 500
+        else:
+            costo = 1500       
         super().__init__(velocidad_nominal = 40,
                          capacidad_de_carga = 100000,
-                         costo_fijo_uso = 1500, #valor arbitrario, puede cmabiar dsps
+                         costo_fijo_uso = costo, 
                          costo_km_recorrido = 15,
                          costo_kg_transportado = 2)        
-        self.modo_de_transporte = 'fluvial' #se pone como default y despues se cambia si hace falta
-    
-    def calcular_costo_tramo(self, distancia, carga, conexion=None):
-        validar_numero_positivo(distancia)
-        validar_numero_positivo(carga)
-        from conexion import Conexion
-        
-        if not isinstance(conexion, Conexion):
-            raise TypeError('Tipo de dato invalido. Debe ser una conexion')
-        
-        if conexion.tipo == 'maritimo':
-            self.costo_fijo_uso = 1500
-            self.modo_de_transporte = 'maritimo'
-        else:
-            self.costo_fijo_uso = 500
-            self.modo_de_transporte = 'fluvial'
-
-        return super().calcular_costo_tramo(distancia, carga)
-
-
+        self.modo_de_transporte = modo_de_transporte 
 
 class Avion(Vehiculo):
-    def __init__(self):
-        super().__init__(velocidad_nominal = 600, #si hay mal tiempo se cambia despues
+    def __init__(self, prob_mal_tiempo = 0):
+        #velocidad = 600 - 200*prob_mal_tiempo (PREGUNTAR Q FORMA VA)
+        super().__init__(velocidad_nominal = 600,
                          capacidad_de_carga = 5000,
                          costo_fijo_uso = 750,
                          costo_km_recorrido = 40,
                          costo_kg_transportado = 10)        
         self.modo_de_transporte = 'aereo'
+        self.prob_mal_tiempo = prob_mal_tiempo
  
-    def calcular_tiempo_tramo(self, distancia, conexion=None):
-        validar_numero_positivo(distancia)
-        from conexion import Conexion
-        
-        if not isinstance(conexion, Conexion):
-            raise TypeError('Tipo de dato invalido. Debe ser una conexion')
-        
-        velocidad = self.velocidad_nominal
-        if conexion.restriccion == "prob_mal_tiempo":
-            velocidad = 400  # velocidad reducida por mal clima
-
-        validar_division_por_cero(velocidad)
-        tiempo = distancia / velocidad
-        return horas_a_hs_y_min(tiempo)
-
+    def getVelocidad(self):
+        if random() <= self.prob_mal_tiempo:
+            velocidad = 400
+        else:
+            velocidad = 600
+        return velocidad
+ 
  
 
 

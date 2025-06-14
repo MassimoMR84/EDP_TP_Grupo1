@@ -51,10 +51,10 @@ def validar_modo_de_transporte(modo_de_transporte):
     '''
     Valida que el modo de transporte sea automotor, ferroviaria, aerea, fluvial
     '''
-    modo = validar_cadena(modo_de_transporte)
-    if modo.strip().lower() not in ['automotor', 'ferroviaria', 'aerea', 'fluvial', 'maritimo']:
+    modo = validar_cadena(modo_de_transporte).strip().lower()
+    if modo not in ['automotor', 'ferroviaria', 'aerea', 'fluvial', 'maritimo']:
         raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviaria, aereo o fluvial.')
-    return modo_de_transporte.strip().lower()
+    return modo
 
 
 def validar_vehiculo(vehiculo): 
