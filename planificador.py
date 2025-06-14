@@ -53,7 +53,7 @@ class Planificador:
                     prob_mal_tiempo = float(conexion.valorRestriccion)
                 except (ValueError, TypeError):
                     prob_mal_tiempo = 0
-            return Avion(prob_mal_tiempo)
+            return Avion(prob_mal_tiempo) # type: ignore
             
         else:
             raise ValueError(f"Tipo de vehículo no reconocido: {tipo}")
@@ -150,41 +150,44 @@ class Planificador:
                     ruta_conexiones.append(conexiones_usadas[nodo])
                     nodo = predecesores[nodo]
                 return ruta_conexiones[::-1]
-                
+            
             for conexion in nodo_actual.conexiones:
                 if (conexion.tipo.lower() == modo.lower() and 
                     conexion.destino not in visitados):
                     
                     # Verificar restricciones
-                    if not self._verificar_restricciones(conexion, peso_carga):
-                        continue
+                    if self._verificar_restricciones(conexion, peso_carga):
                         
-                    # Crear vehículo para esta conexión
-                    try:
-                        vehiculo = self._crear_vehiculo_para_conexion(conexion)
-                    except Exception as e:
-                        print(f"Error creando vehículo para {conexion.tipo}: {e}")
-                        continue
-                    
-                    # Calcular costo según KPI
-                    try:
-                        if kpi == "tiempo":
-                            costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
-                        else:
-                            costo_tramo = vehiculo.calcular_costo_tramo(conexion.distancia, peso_carga)
-                    except Exception as e:
-                        print(f"Error calculando costo: {e}")
-                        continue
-                    
-                    nueva_distancia = distancia_actual + costo_tramo
-                    
-                    if (conexion.destino not in distancias or 
-                        nueva_distancia < distancias[conexion.destino]):
+                        # Crear vehículo para esta conexión
+                        vehiculo_creado = False
+                        try:
+                            vehiculo = self._crear_vehiculo_para_conexion(conexion)
+                            vehiculo_creado = True
+                        except Exception as e:
+                            print(f"Error creando vehículo para {conexion.tipo}: {e}")
                         
-                        distancias[conexion.destino] = nueva_distancia
-                        predecesores[conexion.destino] = nodo_actual
-                        conexiones_usadas[conexion.destino] = conexion
-                        heapq.heappush(heap, (nueva_distancia, conexion.destino))
+                        if vehiculo_creado:
+                            # Calcular costo según KPI
+                            costo_calculado = False
+                            try:
+                                if kpi == "tiempo":
+                                    costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
+                                else:
+                                    costo_tramo = vehiculo.calcular_costo_tramo(conexion.distancia, peso_carga)
+                                costo_calculado = True
+                            except Exception as e:
+                                print(f"Error calculando costo: {e}")
+                            
+                            if costo_calculado:
+                                nueva_distancia = distancia_actual + costo_tramo
+                                
+                                if (conexion.destino not in distancias or 
+                                    nueva_distancia < distancias[conexion.destino]):
+                                    
+                                    distancias[conexion.destino] = nueva_distancia
+                                    predecesores[conexion.destino] = nodo_actual
+                                    conexiones_usadas[conexion.destino] = conexion
+                                    heapq.heappush(heap, (nueva_distancia, conexion.destino))
         
         return None
     
@@ -274,7 +277,8 @@ class Planificador:
                             itinerario = self._construir_itinerario_con_conexiones(conexiones, solicitud.peso_kg, "costo")
                             itinerarios_modo.append(itinerario)
                     except Exception:
-                        continue
+                        # En caso de error, simplemente no agregar este itinerario
+                        pass
                         
                 if itinerarios_modo:
                     todas_las_rutas[modo] = itinerarios_modo

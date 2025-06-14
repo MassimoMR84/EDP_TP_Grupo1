@@ -153,7 +153,7 @@ if __name__ == "__main__":
     camion = Camion()
     tren = Tren()
     barco = Barco('maritimo')
-    avion = Avion(0.1)
+    avion = Avion(0.1) # type: ignore
     
     vehiculos = [camion, tren, barco, avion]
     
