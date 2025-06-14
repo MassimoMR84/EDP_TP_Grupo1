@@ -8,7 +8,29 @@ class Conexion:
     def __init__(self, origen, destino, tipo: str, distancia: int, restriccion=None, valorRestriccion=None):
         self.origen = origen
         self.destino = destino
-        self.tipo = validar_modo_de_transporte(tipo)
+        self.tipo = validar_modo_de_transporte(tipo)  #VER SI NO ES MEJOR Q SEA UN OBJETO VEHICULO DIRECTAMENTE asi no necesitamos pasar las cosas y ya tenemos acceso a toda la info relevante 
+        
+        #comentario posible implementacion a mirar:
+    
+        '''
+        tipo q me pasan es un str entonces:
+        
+        self.tipo = Vehiculo()
+        vlidar q tipo es un vehiculo
+        
+        match tipo:
+            case "avion":
+                self.tipo = Avion(prob_mal_clima)
+            case "automotor":
+                self.tipo = Camion()
+            case "maritimo":
+                self.tipo = Barco(tipo)
+            case "ferroviaria":
+                self.tipo = Tren()
+            case_:
+                raise ValueErro("No esta en la lista")
+        
+        '''        
         self.distancia = validar_numero_mayor_a_cero(distancia)
         self.restriccion = restriccion
         self.valorRestriccion = valorRestriccion
@@ -43,3 +65,4 @@ class Conexion:
 
         return atributo >= float(self.valorRestriccion)
         
+        #AGREGAS RESTRICCION DEL PESO DE LOS CAMIONES
