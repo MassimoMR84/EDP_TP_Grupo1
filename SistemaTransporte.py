@@ -22,7 +22,8 @@ class SistemaTransporte:
 
     def agregar_solicitud(self, solicitud):
         self.solicitudes.append(solicitud)
-        
+      
+    #esto hay q sacarlo (procesar_csv)  
     def procesar_csv (self, file, tipo):
         print("Procesando archivo CSV de tipo:", tipo)
         
@@ -47,6 +48,7 @@ class SistemaTransporte:
         else:
             raise ValueError("Tipo no soportado. Use 'nodo', 'conexion' o 'solicitudes'.")
 
+    #eliminar este tmb
     def lector_csv(self, archivo, tipo = str ):
         '''Función para leer un archivo CSV '''
         with open (archivo, newline='', encoding='utf-8') as file:
