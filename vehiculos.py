@@ -101,13 +101,33 @@ class Tren(Vehiculo):
         validar_positivo(distancia)
         validar_positivo(carga)    
         
-        # Descuento por distancia larga
-        if distancia < 200:
-            self.costo_km_recorrido = 20  # Tarifa normal
-        else:
-            self.costo_km_recorrido = 15  # Descuento 25%
+        # CORREGIDO: Usar variable local en lugar de modificar self
+        costo_km = self.costo_km_recorrido
+        if distancia >= 200:
+            costo_km = self.costo_km_recorrido * 0.75  # Descuento 25%
+        
+        capacidad = self.capacidad_de_carga
+        cargas_por_vehiculo = []
+        
+        # Distribución de carga
+        carga_restante = carga
+        while carga_restante > 0:
+            if carga_restante >= capacidad:  
+                cargas_por_vehiculo.append(capacidad)
+                carga_restante -= capacidad
+            else:
+                cargas_por_vehiculo.append(carga_restante)
+                carga_restante = 0
+        
+        # Calcular costo total
+        costo_total = 0
+        for carga_vehiculo in cargas_por_vehiculo:
+            costo = (self.costo_fijo_uso + 
+                    costo_km * distancia + 
+                    self.costo_kg_transportado * carga_vehiculo)
+            costo_total += costo
             
-        return super().calcular_costo_tramo(distancia, carga)
+        return costo_total
 
 
 class Camion(Vehiculo):
@@ -129,13 +149,33 @@ class Camion(Vehiculo):
         validar_positivo(distancia)
         validar_positivo(carga)    
         
-        # Sobrecargo por carga pesada
-        if carga < 15000:
-            self.costo_kg_transportado = 1  # Tarifa normal
-        else:
-            self.costo_kg_transportado = 2  # Sobrecargo 100%
+        # CORREGIDO: Usar variable local en lugar de modificar self
+        costo_kg = self.costo_kg_transportado
+        if carga > 15000:
+            costo_kg = self.costo_kg_transportado * 2  # Sobrecargo 100%
+        
+        capacidad = self.capacidad_de_carga
+        cargas_por_vehiculo = []
+        
+        # Distribución de carga
+        carga_restante = carga
+        while carga_restante > 0:
+            if carga_restante >= capacidad:  
+                cargas_por_vehiculo.append(capacidad)
+                carga_restante -= capacidad
+            else:
+                cargas_por_vehiculo.append(carga_restante)
+                carga_restante = 0
+        
+        # Calcular costo total
+        costo_total = 0
+        for carga_vehiculo in cargas_por_vehiculo:
+            costo = (self.costo_fijo_uso + 
+                    self.costo_km_recorrido * distancia + 
+                    costo_kg * carga_vehiculo)
+            costo_total += costo
             
-        return super().calcular_costo_tramo(distancia, carga)
+        return costo_total
 
 
 class Barco(Vehiculo):
@@ -195,7 +235,7 @@ if __name__ == "__main__":
     camion = Camion()
     tren = Tren()
     barco = Barco('maritimo')
-    avion = Avion(0.1)  # type: ignore # 10% probabilidad mal tiempo
+    avion = Avion(0.1) # type: ignore
     
     vehiculos = [camion, tren, barco, avion]
     

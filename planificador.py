@@ -116,7 +116,7 @@ class Planificador:
             try:
                 ruta_conexiones = self._dijkstra(nodo_origen, nodo_destino, modo, solicitud.peso_kg, kpi)
                 if ruta_conexiones:
-                    # IMPORTANTE: Pasar la carga real de la solicitud
+                    # Pasar la carga real de la solicitud
                     itinerario = self._construir_itinerario_con_conexiones(
                         ruta_conexiones, solicitud.peso_kg, kpi)
                     mejores_rutas[modo] = itinerario
@@ -182,8 +182,8 @@ class Planificador:
                             if kpi == "tiempo":
                                 costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
                             else:
-                                # Para costo, usar solo el costo del tramo (sin carga)
-                                costo_tramo = vehiculo.calcular_costo_tramo_sin_carga(conexion.distancia, peso_carga)
+                                # CORREGIDO: Usar método que existe
+                                costo_tramo = vehiculo.calcular_costo_tramo(conexion.distancia, peso_carga)
                             
                             nueva_distancia = distancia_actual + costo_tramo
                             
@@ -222,9 +222,9 @@ class Planificador:
     def _construir_itinerario_con_conexiones(self, conexiones, peso_carga, kpi):
         """
         Construye objeto Itinerario a partir de secuencia de conexiones.
-        IMPORTANTE: Pasa la carga real de la solicitud al itinerario.
+        Pasa la carga real de la solicitud al itinerario.
         """
-        # Crear itinerario con la carga real de la solicitud
+        # CORREGIDO: Usar constructor que acepta carga_solicitud
         itinerario = Itinerario(kpi_usado=kpi, carga_solicitud=peso_carga)
         
         for conexion in conexiones:

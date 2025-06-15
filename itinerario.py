@@ -54,7 +54,8 @@ class Itinerario:
     Mantiene métricas totales y información del KPI usado.
     """
     
-    def __init__(self, kpi_usado="tiempo"):
+    # CORREGIDO: Acepta parámetro carga_solicitud que usa el planificador
+    def __init__(self, kpi_usado="tiempo", carga_solicitud=0):
         validar_texto(kpi_usado)
         if kpi_usado not in ["tiempo", "costo"]:
             raise ValueError("KPI debe ser 'tiempo' o 'costo'")
@@ -63,6 +64,7 @@ class Itinerario:
         self.costo_total = 0.0
         self.tiempo_total = 0.0
         self.kpi_usado = kpi_usado
+        self.carga_solicitud = validar_positivo(carga_solicitud)
     
     def _obtener_nombre_nodo(self, nodo):
         """Extrae nombre del nodo de forma robusta"""
@@ -158,6 +160,11 @@ class Itinerario:
         resultado += "=" * 50
         resultado += f"\nCriterio: {self.kpi_usado.upper()}\n"
         resultado += f"Ruta: {' -> '.join(self.obtener_ruta_completa())}\n"
+        
+        # Mostrar carga de la solicitud si está disponible
+        if self.carga_solicitud > 0:
+            resultado += f"Carga: {self.carga_solicitud} kg\n"
+            
         resultado += f"\nDETALLE DE TRAMOS:\n"
         resultado += "-" * 50
         
@@ -169,6 +176,8 @@ class Itinerario:
         resultado += f"\nTramos: {len(self.tramos)}"
         resultado += f"\nDistancia total: {self.obtener_distancia_total():.1f} km"
         resultado += f"\nCarga total: {self.obtener_carga_total():.1f} kg"
+        if self.carga_solicitud > 0:
+            resultado += f"\nCarga de la solicitud: {self.carga_solicitud:.1f} kg"
         resultado += f"\nTiempo total: {self.obtener_tiempo_total_formateado()}"
         resultado += f"\nCosto total: ${self.costo_total:.2f}"
         resultado += f"\nVehículos: {', '.join(set(self.obtener_vehiculos_utilizados()))}"
@@ -205,9 +214,9 @@ if __name__ == "__main__":
         print(f"- {rosario}")
         print(f"- {cordoba}")
         
-        # Itinerario optimizado por tiempo
+        # Itinerario optimizado por tiempo con carga de solicitud
         print(f"\nItinerario por TIEMPO:")
-        itinerario_tiempo = Itinerario(kpi_usado="tiempo")
+        itinerario_tiempo = Itinerario(kpi_usado="tiempo", carga_solicitud=25000)
         
         tramo1 = Tramo(camion, ba, rosario, 300, 15000)
         tramo2 = Tramo(tren, rosario, cordoba, 400, 80000)
@@ -219,24 +228,6 @@ if __name__ == "__main__":
         itinerario_tiempo.agregar_tramo(tramo2)
         
         print(f"\n{itinerario_tiempo}")
-        
-        # Itinerario por costo
-        print(f"\nItinerario por COSTO:")
-        itinerario_costo = Itinerario(kpi_usado="costo")
-        
-        tramo1_costo = Tramo(tren, ba, rosario, 300, 15000)
-        tramo2_costo = Tramo(tren, rosario, cordoba, 400, 80000)
-        
-        itinerario_costo.agregar_tramo(tramo1_costo)
-        itinerario_costo.agregar_tramo(tramo2_costo)
-        
-        print(f"\n{itinerario_costo}")
-        
-        # Comparación
-        print(f"\nCOMPARACIÓN:")
-        print("="*50)
-        print(f"TIEMPO - Duración: {itinerario_tiempo.obtener_tiempo_total_formateado()}, Costo: ${itinerario_tiempo.costo_total:.2f}")
-        print(f"COSTO  - Duración: {itinerario_costo.obtener_tiempo_total_formateado()}, Costo: ${itinerario_costo.costo_total:.2f}")
         
         print("\nPruebas completadas")
         
