@@ -3,9 +3,13 @@ from funciones_auxiliares import *
 from random import random
 
 class Vehiculo:
-    """Clase base para todos los vehículos de transporte"""
+    """
+    Clase base para todos los vehículos de transporte.
+    Define interfaz común y lógica de distribución de carga.
+    """
     
     def __init__(self, velocidad_nominal, capacidad_carga, costo_fijo, costo_km, costo_kg):
+        # Validar todos los parámetros
         validar_positivo(velocidad_nominal)
         validar_mayor_cero(capacidad_carga)
         validar_positivo(costo_fijo)
@@ -19,7 +23,7 @@ class Vehiculo:
         self.costo_kg_transportado = costo_kg
         self.modo_de_transporte = 'generico'
 
-    def __str__(self):  
+    def __str__(self):
         return (f"Modo: {self.modo_de_transporte}\n"
                 f"Velocidad: {self.velocidad_nominal} km/h\n"
                 f"Capacidad: {self.capacidad_de_carga} kg\n"
@@ -28,6 +32,7 @@ class Vehiculo:
                 f"Costo por kg: ${self.costo_kg_transportado}")
         
     def getVelocidad(self):
+        """Velocidad efectiva (puede ser sobrescrita por subclases)"""
         return self.velocidad_nominal
     
     def calcular_tiempo_decimal(self, distancia):
@@ -38,19 +43,22 @@ class Vehiculo:
         return distancia / velocidad
         
     def calcular_tiempo_tramo(self, distancia): 
-        """Calcula tiempo de viaje y lo retorna como tupla (horas, minutos)"""
+        """Calcula tiempo en formato (horas, minutos)"""
         tiempo_decimal = self.calcular_tiempo_decimal(distancia)
         return horas_a_hs_y_min(tiempo_decimal)
     
     def calcular_costo_tramo(self, distancia, carga): 
-        """Calcula costo total considerando múltiples vehículos si es necesario"""
+        """
+        Calcula costo total considerando múltiples vehículos si es necesario.
+        Distribuye carga llenando vehículos al máximo antes de agregar otro.
+        """
         validar_positivo(distancia)
         validar_positivo(carga)
         
         capacidad = self.capacidad_de_carga
         cargas_por_vehiculo = []
         
-        # Distribuir carga entre vehículos
+        # Algoritmo de distribución: llenar cada vehículo al máximo
         while carga > 0:
             if carga >= capacidad:  
                 cargas_por_vehiculo.append(capacidad)
@@ -59,7 +67,7 @@ class Vehiculo:
                 cargas_por_vehiculo.append(carga)
                 carga = 0
         
-        # Calcular costo total
+        # Calcular costo total para todos los vehículos
         costo_total = 0
         for carga_vehiculo in cargas_por_vehiculo:
             costo = (self.costo_fijo_uso + 
@@ -70,99 +78,133 @@ class Vehiculo:
         return costo_total
     
     def puede_transportar(self, peso_carga=0):
-        """Por defecto todos los vehículos pueden transportar"""
+        """Verifica si puede transportar una carga (base: siempre True)"""
         return True
-    
+
+
 class Tren(Vehiculo):
+    """
+    Vehículo ferroviario de alta capacidad.
+    Aplica descuentos por distancia (economías de escala).
+    """
+    
     def __init__(self):
-        super().__init__(velocidad_nominal = 100,
-                         capacidad_carga = 150000,
-                         costo_fijo = 100,
-                         costo_km = 20,
-                         costo_kg = 3)        
+        super().__init__(velocidad_nominal=100,   # km/h
+                         capacidad_carga=150000,  # kg - muy alta capacidad
+                         costo_fijo=100,          # $
+                         costo_km=20,             # $/km
+                         costo_kg=3)              # $/kg
         self.modo_de_transporte = 'ferroviaria'
    
     def calcular_costo_tramo(self, distancia, carga):
+        """Aplica descuento del 25% para distancias largas (>200km)"""
         validar_positivo(distancia)
         validar_positivo(carga)    
         
-        # Descuento para distancias largas
+        # Descuento por distancia larga
         if distancia < 200:
-            self.costo_km_recorrido = 20
+            self.costo_km_recorrido = 20  # Tarifa normal
         else:
-            self.costo_km_recorrido = 15      
+            self.costo_km_recorrido = 15  # Descuento 25%
+            
         return super().calcular_costo_tramo(distancia, carga)
-       
-       
+
+
 class Camion(Vehiculo):
+    """
+    Vehículo automotor flexible.
+    Aplica sobrecosto para cargas pesadas (>15 toneladas).
+    """
+    
     def __init__(self):
-        super().__init__(velocidad_nominal = 80,
-                         capacidad_carga = 30000,
-                         costo_fijo = 30,
-                         costo_km = 5,
-                         costo_kg = 1)      
+        super().__init__(velocidad_nominal=80,     # km/h
+                         capacidad_carga=30000,    # kg
+                         costo_fijo=30,            # $
+                         costo_km=5,               # $/km
+                         costo_kg=1)               # $/kg
         self.modo_de_transporte = 'automotor'    
        
     def calcular_costo_tramo(self, distancia, carga):
+        """Dobla el costo por kg para cargas pesadas (>15 toneladas)"""
         validar_positivo(distancia)
         validar_positivo(carga)    
         
-        # Costo extra para cargas pesadas
+        # Sobrecargo por carga pesada
         if carga < 15000:
-            self.costo_kg_transportado = 1
+            self.costo_kg_transportado = 1  # Tarifa normal
         else:
-            self.costo_kg_transportado = 2    
+            self.costo_kg_transportado = 2  # Sobrecargo 100%
+            
         return super().calcular_costo_tramo(distancia, carga)
-    
-    
+
+
 class Barco(Vehiculo):
+    """
+    Vehículo acuático con costos diferenciados.
+    Fluvial: $500 base, Marítimo: $1500 base.
+    """
+    
     def __init__(self, tipo_navegacion='maritimo'):
         # Costo diferente según tipo de navegación
         if tipo_navegacion == 'fluvial':
-            costo = 500
+            costo = 500   # Navegación en ríos
         else:
-            costo = 1500       
-        super().__init__(velocidad_nominal = 40,
-                         capacidad_carga = 100000,
-                         costo_fijo = costo, 
-                         costo_km = 15,
-                         costo_kg = 2)        
-        self.modo_de_transporte = tipo_navegacion 
+            costo = 1500  # Navegación marítima
+            
+        super().__init__(velocidad_nominal=40,      # km/h
+                         capacidad_carga=100000,    # kg - alta capacidad
+                         costo_fijo=costo,          # $ - variable según tipo
+                         costo_km=15,               # $/km
+                         costo_kg=2)                # $/kg
+        
+        self.modo_de_transporte = tipo_navegacion
+
 
 class Avion(Vehiculo):
-    def __init__(self, prob_mal_tiempo = 0):
-        super().__init__(velocidad_nominal = 600,
-                         capacidad_carga = 5000,
-                         costo_fijo = 750,
-                         costo_km = 40,
-                         costo_kg = 10)        
+    """
+    Vehículo aéreo de alta velocidad.
+    Velocidad variable según condiciones climáticas.
+    """
+    
+    def __init__(self, prob_mal_tiempo=0):
+        super().__init__(velocidad_nominal=600,     # km/h - muy rápido
+                         capacidad_carga=5000,      # kg - limitada
+                         costo_fijo=750,            # $ - alto costo
+                         costo_km=40,               # $/km - costoso
+                         costo_kg=10)               # $/kg - el más caro
+        
         self.modo_de_transporte = 'aerea'
         self.prob_mal_tiempo = prob_mal_tiempo
  
     def getVelocidad(self):
-        # Velocidad reducida con mal tiempo
+        """
+        Velocidad efectiva considerando clima.
+        Mal tiempo reduce velocidad de 600 a 400 km/h.
+        """
         if random() <= self.prob_mal_tiempo:
-            return 400
+            return 400  # Velocidad reducida por mal tiempo
         else:
-            return 600
+            return 600  # Velocidad nominal
 
+
+# Código de prueba
 if __name__ == "__main__":
     print("Probando vehículos...")
     
-    # Crear vehículos
+    # Crear instancia de cada tipo
     camion = Camion()
     tren = Tren()
     barco = Barco('maritimo')
-    avion = Avion(0.1) # type: ignore
+    avion = Avion(0.1)  # type: ignore # 10% probabilidad mal tiempo
     
     vehiculos = [camion, tren, barco, avion]
     
-    # Probar cada vehículo
+    # Probar con parámetros de ejemplo
     for vehiculo in vehiculos:
         print(f"\n--- {vehiculo.modo_de_transporte.upper()} ---")
         print(vehiculo)
         
-        # Calcular para distancia y carga de prueba
+        # Calcular métricas para 300km, 25000kg
         distancia_prueba = 300
         carga_prueba = 25000
         

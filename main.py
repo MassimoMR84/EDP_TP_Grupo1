@@ -4,7 +4,7 @@ from solicitud_transporte import SolicitudTransporte
 from planificador import Planificador
 import csv
 
-# Importar gráficos si están disponibles
+# Importar gráficos si matplotlib está disponible
 try:
     from graficos import generar_todos_los_graficos, grafico_comparacion_caminos, grafico_comparacion_tiempos
     GRAFICOS_DISPONIBLES = True
@@ -12,14 +12,20 @@ except ImportError:
     print("Matplotlib no disponible - gráficos deshabilitados")
     GRAFICOS_DISPONIBLES = False
 
+
 class SistemaTransporte:
+    """
+    Clase principal que maneja la red de transporte completa.
+    Carga datos desde CSV y coordina el procesamiento de solicitudes.
+    """
+    
     def __init__(self):
-        self.nodos = {}
-        self.conexiones = []
-        self.solicitudes = []
+        self.nodos = {}          # {nombre: objeto_Nodo}
+        self.conexiones = []     # Lista de conexiones
+        self.solicitudes = []    # Lista de solicitudes
 
     def cargar_nodos(self, archivo_csv):
-        """Carga nodos desde archivo CSV"""
+        """Carga nodos desde archivo CSV con columna 'nombre'"""
         print(f"Cargando nodos desde {archivo_csv}...")
         try:
             with open(archivo_csv, newline='', encoding='utf-8') as f:
@@ -34,17 +40,21 @@ class SistemaTransporte:
             raise
 
     def cargar_conexiones(self, archivo_csv):
-        """Carga conexiones desde archivo CSV"""
+        """Carga conexiones con restricciones opcionales desde CSV"""
         print(f"Cargando conexiones desde {archivo_csv}...")
         try:
             with open(archivo_csv, newline='', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 conexiones_agregadas = 0
+                
                 for row in reader:
+                    # Extraer datos básicos
                     origen_nombre = row['origen'].strip()
                     destino_nombre = row['destino'].strip()
                     tipo = row['tipo'].strip()
                     distancia = float(row['distancia_km'])
+                    
+                    # Restricciones opcionales
                     restriccion = row.get('restriccion', '').strip() or None
                     valor_restriccion = row.get('valor_restriccion', '').strip() or None
                     
@@ -74,12 +84,13 @@ class SistemaTransporte:
             raise
 
     def cargar_solicitudes(self, archivo_csv):
-        """Carga solicitudes desde archivo CSV"""
+        """Carga solicitudes de transporte desde CSV"""
         print(f"Cargando solicitudes desde {archivo_csv}...")
         try:
             with open(archivo_csv, newline='', encoding='utf-8') as f:
                 reader = csv.DictReader(f)
                 solicitudes_agregadas = 0
+                
                 for row in reader:
                     try:
                         id_carga = row['id_carga'].strip()
@@ -108,7 +119,7 @@ class SistemaTransporte:
             raise
 
     def mostrar_resumen(self):
-        """Muestra resumen del sistema cargado"""
+        """Muestra resumen del sistema cargado con estadísticas"""
         print("\n" + "="*60)
         print("RESUMEN DEL SISTEMA DE TRANSPORTE")
         print("="*60)
@@ -118,16 +129,15 @@ class SistemaTransporte:
         
         print("\nNODOS Y CONEXIONES:")
         for nombre, nodo in self.nodos.items():
+            # Contar conexiones por tipo
             conexiones_por_tipo = {}
             restricciones_especiales = []
             
             for conexion in nodo.conexiones:
                 tipo = conexion.tipo.lower()
-                if tipo not in conexiones_por_tipo:
-                    conexiones_por_tipo[tipo] = 0
-                conexiones_por_tipo[tipo] += 1
+                conexiones_por_tipo[tipo] = conexiones_por_tipo.get(tipo, 0) + 1
                 
-                # Detectar restricciones especiales
+                # Detectar restricciones para mostrar
                 if conexion.restriccion and conexion.valorRestriccion is not None:
                     info_restriccion = conexion.obtener_info_restriccion()
                     restricciones_especiales.append(f"{conexion.destino.nombre}: {info_restriccion}")
@@ -135,19 +145,18 @@ class SistemaTransporte:
             tipos_str = ", ".join([f"{tipo}: {count}" for tipo, count in conexiones_por_tipo.items()])
             print(f"  {nombre}: {len(nodo.conexiones)} conexiones ({tipos_str})")
             
-            # Mostrar algunas restricciones
-            if restricciones_especiales:
-                for restriccion in restricciones_especiales[:3]:
-                    print(f"    Restricción: {restriccion}")
-                if len(restricciones_especiales) > 3:
-                    print(f"    ... y {len(restricciones_especiales) - 3} más")
+            # Mostrar algunas restricciones (máximo 3)
+            for restriccion in restricciones_especiales[:3]:
+                print(f"    Restricción: {restriccion}")
+            if len(restricciones_especiales) > 3:
+                print(f"    ... y {len(restricciones_especiales) - 3} más")
         
         print(f"\nSOLICITUDES:")
         for solicitud in self.solicitudes:
             print(f"  {solicitud}")
 
     def verificar_conectividad(self):
-        """Verifica conectividad básica del grafo"""
+        """Verifica qué modos de transporte están disponibles para cada solicitud"""
         print(f"\nVERIFICANDO CONECTIVIDAD...")
         
         for solicitud in self.solicitudes:
@@ -180,8 +189,12 @@ class SistemaTransporte:
                     bloqueados_str = ", ".join(conexiones_bloqueadas)
                     print(f"    Bloqueadas: {bloqueados_str}")
 
+
 def procesar_solicitudes(sistema, planificador):
-    """Procesa todas las solicitudes del sistema"""
+    """
+    Procesa todas las solicitudes generando itinerarios optimizados por tiempo y costo.
+    Genera gráficos comparativos si matplotlib está disponible.
+    """
     print("\n" + "="*60)
     print("PROCESANDO SOLICITUDES")
     print("="*60)
@@ -195,7 +208,7 @@ def procesar_solicitudes(sistema, planificador):
         print(f"Carga: {solicitud.peso_kg} kg")
         print(f"Ruta: {solicitud.origen.nombre} -> {solicitud.destino.nombre}")
         
-        # Optimizar por tiempo
+        # Optimización por tiempo
         print(f"\nOPTIMIZACIÓN POR TIEMPO:")
         print("-" * 40)
         try:
@@ -205,7 +218,7 @@ def procesar_solicitudes(sistema, planificador):
                 print(itinerario_tiempo)
                 resultados_tiempo[f"{solicitud.id_carga}_tiempo"] = itinerario_tiempo
                 
-                # Generar gráficos para primera solicitud
+                # Gráficos para primera solicitud
                 if i == 1 and GRAFICOS_DISPONIBLES:
                     try:
                         print(f"\nGenerando gráficos por tiempo...")
@@ -219,7 +232,7 @@ def procesar_solicitudes(sistema, planificador):
             import traceback
             traceback.print_exc()
         
-        # Optimizar por costo
+        # Optimización por costo
         print(f"\nOPTIMIZACIÓN POR COSTO:")
         print("-" * 40)
         try:
@@ -229,7 +242,7 @@ def procesar_solicitudes(sistema, planificador):
                 print(itinerario_costo)
                 resultados_costo[f"{solicitud.id_carga}_costo"] = itinerario_costo
                 
-                # Generar gráficos para primera solicitud
+                # Gráficos para primera solicitud
                 if i == 1 and GRAFICOS_DISPONIBLES:
                     try:
                         print(f"\nGenerando gráficos por costo...")
@@ -243,7 +256,7 @@ def procesar_solicitudes(sistema, planificador):
             import traceback
             traceback.print_exc()
         
-        # Comparación directa
+        # Comparación directa entre ambas optimizaciones
         if (f"{solicitud.id_carga}_tiempo" in resultados_tiempo and 
             f"{solicitud.id_carga}_costo" in resultados_costo):
             
@@ -268,7 +281,7 @@ def procesar_solicitudes(sistema, planificador):
         
         print("\n" + "="*60)
     
-    # Gráficos comparativos
+    # Gráficos comparativos finales
     if GRAFICOS_DISPONIBLES and (len(resultados_tiempo) > 1 or len(resultados_costo) > 1):
         try:
             print(f"\nGenerando gráficos comparativos...")
@@ -279,33 +292,33 @@ def procesar_solicitudes(sistema, planificador):
         except Exception as e:
             print(f"Error en gráficos comparativos: {e}")
 
+
 def main():
-    """Función principal del sistema"""
+    """
+    Función principal: carga datos, crea planificador y procesa solicitudes.
+    Maneja errores comunes como archivos faltantes.
+    """
     print("="*50)
     print("SISTEMA DE TRANSPORTE - INICIANDO")
     print("="*50)
     
     try:
-        # Crear sistema
+        # Crear sistema y cargar datos
         sistema = SistemaTransporte()
         
-        # Cargar datos
         sistema.cargar_nodos('nodos.csv')
         sistema.cargar_conexiones('conexiones.csv')
         sistema.cargar_solicitudes('solicitudes.csv')
         
-        # Mostrar resumen
+        # Mostrar información del sistema
         sistema.mostrar_resumen()
-        
-        # Verificar conectividad
         sistema.verificar_conectividad()
         
-        # Crear planificador
+        # Crear planificador y procesar solicitudes
         print(f"\nCreando planificador...")
         planificador = Planificador(sistema)
         print(f"Planificador listo con {len(planificador.vehiculos_disponibles)} tipos de vehículos")
         
-        # Procesar solicitudes
         procesar_solicitudes(sistema, planificador)
         
         print(f"\nPROCESAMIENTO COMPLETADO")
@@ -328,6 +341,7 @@ def main():
         print("  - Formato de archivos CSV")
         print("  - Referencias entre nodos y conexiones")
         print("  - Datos numéricos válidos")
+
 
 if __name__ == "__main__":
     main()

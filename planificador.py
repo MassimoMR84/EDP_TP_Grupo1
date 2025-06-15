@@ -4,13 +4,15 @@ from vehiculos import Vehiculo, Camion, Tren, Barco, Avion
 import heapq
 
 class Planificador: 
-    """Planifica itinerarios optimizados según diferentes KPIs"""   
+    """
+    Planificador que optimiza itinerarios según tiempo o costo usando Dijkstra.
+    Maneja restricciones específicas de cada tipo de conexión.
+    """   
     
     def __init__(self, red_transporte):
-        """Inicializa el planificador con una red de transporte"""
         self.red_transporte = red_transporte
         
-        # Mapeo de tipos de vehículos
+        # Mapeo de tipos de conexión a clases de vehículos
         self.tipos_vehiculos = {
             'ferroviaria': Tren,
             'automotor': Camion,
@@ -20,7 +22,9 @@ class Planificador:
         self.vehiculos_disponibles = self.tipos_vehiculos
         
     def _crear_vehiculo_para_conexion(self, conexion):
-        """Crea vehículo específico según conexión y restricciones"""
+        """
+        Crea vehículo específico adaptado a las restricciones de la conexión.
+        """
         tipo = conexion.tipo.lower()
         
         if tipo == 'ferroviaria':
@@ -59,12 +63,16 @@ class Planificador:
             raise ValueError(f"Tipo de vehículo no reconocido: {tipo}")
 
     def buscar_rutas(self, nodo_actual, destino, modo, recorrido=None):
-        """Busca todas las rutas posibles entre nodos usando un modo específico"""
+        """
+        Busca todas las rutas posibles entre dos nodos usando búsqueda en profundidad.
+        Evita ciclos manteniendo registro de nodos visitados.
+        """
         if recorrido is None:
             recorrido = []
 
         recorrido = recorrido + [nodo_actual]
 
+        # Caso base: llegamos al destino
         if nodo_actual == destino:
             return [recorrido]
 
@@ -72,6 +80,7 @@ class Planificador:
         for conexion in nodo_actual.conexiones:
             if conexion.tipo.lower() == modo.lower():
                 siguiente_nodo = conexion.destino
+                # Evitar ciclos
                 if siguiente_nodo not in recorrido:
                     nuevos_caminos = self.buscar_rutas(siguiente_nodo, destino, modo, recorrido)
                     caminos.extend(nuevos_caminos)
@@ -79,11 +88,14 @@ class Planificador:
         return caminos
 
     def encontrar_ruta_optima(self, solicitud, kpi="tiempo"):
-        """Encuentra la ruta óptima usando Dijkstra"""
+        """
+        Encuentra la ruta óptima probando todos los modos de transporte.
+        Usa Dijkstra para cada modo y selecciona el mejor según KPI.
+        """
+        # Obtener nodos de origen y destino
         origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
         destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
         
-        # Buscar nodos en la red
         nodo_origen = None
         nodo_destino = None
         
@@ -104,7 +116,9 @@ class Planificador:
             try:
                 ruta_conexiones = self._dijkstra(nodo_origen, nodo_destino, modo, solicitud.peso_kg, kpi)
                 if ruta_conexiones:
-                    itinerario = self._construir_itinerario_con_conexiones(ruta_conexiones, solicitud.peso_kg, kpi)
+                    # IMPORTANTE: Pasar la carga real de la solicitud
+                    itinerario = self._construir_itinerario_con_conexiones(
+                        ruta_conexiones, solicitud.peso_kg, kpi)
                     mejores_rutas[modo] = itinerario
             except Exception as e:
                 print(f"Error calculando ruta para {modo}: {e}")
@@ -121,18 +135,22 @@ class Planificador:
         return mejor
     
     def _dijkstra(self, origen, destino, modo, peso_carga, kpi):
-        """Implementación de Dijkstra que retorna conexiones utilizadas"""
+        """
+        Implementación de Dijkstra para encontrar camino óptimo.
+        Usa cola de prioridad para eficiencia O((V+E) log V).
+        """
         # Verificar que origen tenga conexiones del modo especificado
         tiene_conexion_origen = any(conexion.tipo.lower() == modo.lower() 
                                   for conexion in origen.conexiones)
         if not tiene_conexion_origen:
             return None
         
+        # Estructuras para Dijkstra
         distancias = {origen: 0}
         predecesores = {origen: None}
         conexiones_usadas = {origen: None}
         visitados = set()
-        heap = [(0, origen)]
+        heap = [(0, origen)]  # Cola de prioridad
         
         while heap:
             distancia_actual, nodo_actual = heapq.heappop(heap)
@@ -142,61 +160,56 @@ class Planificador:
                 
             visitados.add(nodo_actual)
             
+            # Si llegamos al destino, reconstruir camino
             if nodo_actual == destino:
-                # Reconstruir ruta
                 ruta_conexiones = []
                 nodo = destino
                 while conexiones_usadas[nodo] is not None:
                     ruta_conexiones.append(conexiones_usadas[nodo])
                     nodo = predecesores[nodo]
-                return ruta_conexiones[::-1]
+                return ruta_conexiones[::-1]  # Invertir para orden correcto
             
+            # Explorar conexiones adyacentes
             for conexion in nodo_actual.conexiones:
                 if (conexion.tipo.lower() == modo.lower() and 
                     conexion.destino not in visitados):
                     
-                    # Verificar restricciones
                     if self._verificar_restricciones(conexion, peso_carga):
-                        
-                        # Crear vehículo para esta conexión
-                        vehiculo_creado = False
                         try:
                             vehiculo = self._crear_vehiculo_para_conexion(conexion)
-                            vehiculo_creado = True
-                        except Exception as e:
-                            print(f"Error creando vehículo para {conexion.tipo}: {e}")
-                        
-                        if vehiculo_creado:
-                            # Calcular costo según KPI
-                            costo_calculado = False
-                            try:
-                                if kpi == "tiempo":
-                                    costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
-                                else:
-                                    costo_tramo = vehiculo.calcular_costo_tramo(conexion.distancia, peso_carga)
-                                costo_calculado = True
-                            except Exception as e:
-                                print(f"Error calculando costo: {e}")
                             
-                            if costo_calculado:
-                                nueva_distancia = distancia_actual + costo_tramo
+                            # Calcular costo según KPI
+                            if kpi == "tiempo":
+                                costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
+                            else:
+                                # Para costo, usar solo el costo del tramo (sin carga)
+                                costo_tramo = vehiculo.calcular_costo_tramo_sin_carga(conexion.distancia, peso_carga)
+                            
+                            nueva_distancia = distancia_actual + costo_tramo
+                            
+                            # Actualizar si encontramos mejor camino
+                            if (conexion.destino not in distancias or 
+                                nueva_distancia < distancias[conexion.destino]):
                                 
-                                if (conexion.destino not in distancias or 
-                                    nueva_distancia < distancias[conexion.destino]):
-                                    
-                                    distancias[conexion.destino] = nueva_distancia
-                                    predecesores[conexion.destino] = nodo_actual
-                                    conexiones_usadas[conexion.destino] = conexion
-                                    heapq.heappush(heap, (nueva_distancia, conexion.destino))
+                                distancias[conexion.destino] = nueva_distancia
+                                predecesores[conexion.destino] = nodo_actual
+                                conexiones_usadas[conexion.destino] = conexion
+                                heapq.heappush(heap, (nueva_distancia, conexion.destino))
+                                
+                        except Exception as e:
+                            print(f"Error procesando conexión: {e}")
         
         return None
     
     def _verificar_restricciones(self, conexion, peso_carga):
-        """Verifica si una carga puede usar una conexión"""
+        """
+        Verifica si una carga puede usar una conexión específica.
+        Principalmente maneja restricciones de peso máximo en automotor.
+        """
         if not conexion.restriccion:
             return True
             
-        # Restricción de peso máximo para automotor
+        # Restricción de peso máximo para conexiones automotrices
         if conexion.restriccion == "peso_max" and conexion.tipo.lower() == "automotor":
             try:
                 peso_maximo = float(conexion.valorRestriccion)
@@ -207,8 +220,12 @@ class Planificador:
         return True
     
     def _construir_itinerario_con_conexiones(self, conexiones, peso_carga, kpi):
-        """Construye itinerario a partir de conexiones"""
-        itinerario = Itinerario(kpi_usado=kpi)
+        """
+        Construye objeto Itinerario a partir de secuencia de conexiones.
+        IMPORTANTE: Pasa la carga real de la solicitud al itinerario.
+        """
+        # Crear itinerario con la carga real de la solicitud
+        itinerario = Itinerario(kpi_usado=kpi, carga_solicitud=peso_carga)
         
         for conexion in conexiones:
             vehiculo = self._crear_vehiculo_para_conexion(conexion)
@@ -218,14 +235,17 @@ class Planificador:
                 origen=conexion.origen,
                 destino=conexion.destino,
                 distancia=conexion.distancia,
-                carga=peso_carga
+                carga=peso_carga  # Cada tramo lleva la carga completa
             )
             itinerario.agregar_tramo(tramo)
                 
         return itinerario
     
     def generar_itinerario(self, solicitud, kpi="tiempo"):
-        """Método principal para generar itinerario óptimo"""
+        """
+        Método principal para generar itinerario óptimo.
+        Punto de entrada usado por otros módulos.
+        """
         try:
             return self.encontrar_ruta_optima(solicitud, kpi)
         except Exception as e:
@@ -233,7 +253,10 @@ class Planificador:
             return None
     
     def encontrar_todas_las_rutas(self, solicitud):
-        """Encuentra todas las rutas posibles en todos los modos"""
+        """
+        Encuentra todas las rutas posibles en todos los modos de transporte.
+        Útil para análisis y comparación de alternativas.
+        """
         origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
         destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
         
@@ -257,9 +280,10 @@ class Planificador:
             rutas_modo = self.buscar_rutas(nodo_origen, nodo_destino, modo)
             if rutas_modo:
                 itinerarios_modo = []
+                
+                # Convertir rutas de nodos a itinerarios
                 for ruta in rutas_modo:
                     try:
-                        # Convertir ruta de nodos a conexiones
                         conexiones = []
                         for i in range(len(ruta) - 1):
                             nodo_origen_tramo = ruta[i]
@@ -274,23 +298,19 @@ class Planificador:
                                     break
                         
                         if len(conexiones) == len(ruta) - 1:
-                            itinerario = self._construir_itinerario_con_conexiones(conexiones, solicitud.peso_kg, "costo")
+                            itinerario = self._construir_itinerario_con_conexiones(
+                                conexiones, solicitud.peso_kg, "costo")
                             itinerarios_modo.append(itinerario)
                     except Exception:
-                        # En caso de error, simplemente no agregar este itinerario
-                        pass
+                        pass  # Saltar rutas con errores
                         
                 if itinerarios_modo:
                     todas_las_rutas[modo] = itinerarios_modo
                     
         return todas_las_rutas
 
+
 if __name__ == "__main__":
     print("Probando planificador...")
-    print("Para probar completamente, ejecutar main.py con archivos CSV")
-    print("El planificador maneja:")
-    print("- Restricciones de velocidad (ferroviaria)")
-    print("- Restricciones de peso (automotor)")
-    print("- Tipos de barco (fluvial/marítimo)")
-    print("- Probabilidades climáticas (aérea)")
-    print("- Manejo de errores mejorado")
+    print("Para pruebas completas, ejecutar main.py con archivos CSV")
+    print("Maneja restricciones de velocidad, peso, tipos de barco y clima")

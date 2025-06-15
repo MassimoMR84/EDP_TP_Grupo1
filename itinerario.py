@@ -4,7 +4,10 @@ from nodo import Nodo
 from vehiculos import Vehiculo
 
 class Tramo:
-    """Un segmento del viaje completo"""
+    """
+    Un segmento individual del viaje (vehículo entre dos nodos).
+    Calcula automáticamente tiempo y costo basándose en el vehículo.
+    """
 
     def __init__(self, vehiculo, origen, destino, distancia, carga=0):
         self.vehiculo = validar_vehiculo(vehiculo)
@@ -13,20 +16,20 @@ class Tramo:
         self.distancia = validar_positivo(distancia)
         self.carga = validar_positivo(carga)
         
-        # Calcular tiempo y costo automáticamente
+        # Cálculos automáticos basados en el vehículo
         self.tiempo = self._calcular_tiempo_decimal()
         self.costo = self._calcular_costo()
     
     def _calcular_tiempo_decimal(self):
-        """Usa el método del vehículo para calcular tiempo"""
+        """Delega cálculo al método del vehículo"""
         return self.vehiculo.calcular_tiempo_decimal(self.distancia)
     
     def _calcular_costo(self):
-        """Usa el método del vehículo para calcular costo"""
+        """Delega cálculo al método del vehículo"""
         return self.vehiculo.calcular_costo_tramo(self.distancia, self.carga)
     
     def _obtener_nombre_nodo(self, nodo):
-        """Extrae el nombre del nodo"""
+        """Extrae nombre del nodo de forma robusta"""
         if hasattr(nodo, 'nombre'):
             return nodo.nombre
         return str(nodo)
@@ -44,8 +47,12 @@ class Tramo:
     def __repr__(self):
         return self.__str__()
 
+
 class Itinerario:
-    """Plan de viaje completo"""
+    """
+    Plan de viaje completo con validaciones de continuidad y anti-ciclos.
+    Mantiene métricas totales y información del KPI usado.
+    """
     
     def __init__(self, kpi_usado="tiempo"):
         validar_texto(kpi_usado)
@@ -58,24 +65,29 @@ class Itinerario:
         self.kpi_usado = kpi_usado
     
     def _obtener_nombre_nodo(self, nodo):
-        """Extrae nombre del nodo"""
+        """Extrae nombre del nodo de forma robusta"""
         if hasattr(nodo, 'nombre'):  
             return nodo.nombre
         return str(nodo)  
     
     def agregar_tramo(self, tramo):
-        """Agrega un tramo al itinerario"""
+        """
+        Agrega tramo con validaciones:
+        - Continuidad geográfica
+        - Prevención de ciclos
+        - Recálculo de totales
+        """
         if not isinstance(tramo, Tramo):
             raise TypeError("Debe ser un tramo válido")
         
-        # Verificar continuidad
+        # Verificar continuidad con tramo anterior
         if self.tramos:
             ultimo_destino = self._obtener_nombre_nodo(self.tramos[-1].destino)
             nuevo_origen = self._obtener_nombre_nodo(tramo.origen)
             if nuevo_origen != ultimo_destino:
                 raise ValueError(f"Tramo no es continuo. Último destino: {ultimo_destino}, Nuevo origen: {nuevo_origen}")
         
-        # Evitar ciclos
+        # Evitar ciclos básicos
         if self._tiene_ciclo_basico(tramo):
             destino_nombre = self._obtener_nombre_nodo(tramo.destino)
             raise ValueError(f"Ciclo detectado: nodo {destino_nombre} ya visitado")
@@ -100,7 +112,7 @@ class Itinerario:
         return nuevo_destino in nodos_visitados
     
     def calcular_totales(self):
-        """Recalcula totales"""
+        """Recalcula totales sumando todos los tramos"""
         self.costo_total = sum(tramo.costo for tramo in self.tramos)
         self.tiempo_total = sum(tramo.tiempo for tramo in self.tramos)
     
@@ -113,7 +125,7 @@ class Itinerario:
         return sum(tramo.carga for tramo in self.tramos)
     
     def obtener_ruta_completa(self):
-        """Lista de nodos en la ruta"""
+        """Lista de nodos en orden de visita"""
         if not self.tramos:
             return []
         
@@ -123,7 +135,7 @@ class Itinerario:
         return ruta
     
     def obtener_vehiculos_utilizados(self):
-        """Tipos de vehículos usados"""
+        """Lista de tipos de vehículos usados"""
         return [tramo.vehiculo.modo_de_transporte for tramo in self.tramos]
     
     def obtener_tiempo_total_formateado(self):
@@ -168,17 +180,18 @@ class Itinerario:
     def __repr__(self):
         return f"Itinerario(tramos={len(self.tramos)}, kpi='{self.kpi_usado}', costo=${self.costo_total:.2f}, tiempo={self.tiempo_total:.1f}h)"
 
+
+# Código de prueba
 if __name__ == "__main__":
     print("Probando sistema de itinerarios...")
     
     try:
         from vehiculos import Camion, Tren
         
-        # Crear vehículos
+        # Crear vehículos y nodos
         camion = Camion()
         tren = Tren()
         
-        # Crear nodos
         ba = Nodo("Buenos_Aires")
         rosario = Nodo("Rosario")
         cordoba = Nodo("Cordoba")
@@ -192,7 +205,7 @@ if __name__ == "__main__":
         print(f"- {rosario}")
         print(f"- {cordoba}")
         
-        # Crear itinerario optimizado por tiempo
+        # Itinerario optimizado por tiempo
         print(f"\nItinerario por TIEMPO:")
         itinerario_tiempo = Itinerario(kpi_usado="tiempo")
         

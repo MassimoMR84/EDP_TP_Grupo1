@@ -1,7 +1,10 @@
 from validaciones import *
 
 class Conexion:
-    """Representa una ruta entre dos nodos con posibles restricciones"""
+    """
+    Representa una ruta entre dos nodos con posibles restricciones.
+    Encapsula información de distancia, tipo de transporte y limitaciones.
+    """
     
     def __init__(self, origen, destino, tipo, distancia, restriccion=None, valorRestriccion=None):
         self.origen = origen
@@ -9,7 +12,7 @@ class Conexion:
         self.tipo = validar_modo_transporte(tipo)
         self.distancia = validar_mayor_cero(distancia)
         
-        # Procesar restricciones
+        # Procesar restricciones opcionales
         self.restriccion = restriccion.strip() if restriccion and restriccion.strip() else None
         self.valorRestriccion = None
         
@@ -29,7 +32,7 @@ class Conexion:
             return f"Origen:{self.origen}\nDestino:{self.destino}\nModo: {self.tipo}\nDistancia: {self.distancia}\nRestricción:{self.restriccion}\nValor: {self.valorRestriccion}\n\n"
 
     def __eq__(self, otra_conexion):
-        """Compara dos conexiones"""
+        """Dos conexiones son iguales si conectan los mismos nodos con el mismo modo"""
         return (isinstance(otra_conexion, Conexion) 
                 and self.origen == otra_conexion.origen 
                 and self.destino == otra_conexion.destino 
@@ -40,17 +43,19 @@ class Conexion:
         if not self.restriccion or self.valorRestriccion is None:
             return True
         
-        # Restricción de velocidad máxima para trenes
+        # Restricción de velocidad máxima (principalmente trenes)
         if self.restriccion == "velocidad_max":
             if hasattr(vehiculo, 'velocidad_nominal'):
                 return vehiculo.velocidad_nominal <= float(self.valorRestriccion)
             return True
         
-        # Otras restricciones se manejan en el planificador
-        return True
+        return True  # Otras restricciones se manejan en el planificador
         
     def es_compatible_con_carga(self, peso_carga):
-        """Verifica si una carga puede pasar por esta conexión"""
+        """
+        Verifica si una carga puede pasar por esta conexión.
+        Principalmente para restricciones de peso en puentes.
+        """
         if self.restriccion == "peso_max" and self.valorRestriccion is not None:
             try:
                 peso_maximo = float(self.valorRestriccion)
@@ -60,7 +65,7 @@ class Conexion:
         return True
     
     def obtener_velocidad_efectiva(self, vehiculo):
-        """Obtiene velocidad considerando restricciones"""
+        """Calcula velocidad considerando restricciones de la conexión"""
         velocidad_base = vehiculo.getVelocidad() if hasattr(vehiculo, 'getVelocidad') else vehiculo.velocidad_nominal
         
         if self.restriccion == "velocidad_max" and self.valorRestriccion is not None:
@@ -73,7 +78,7 @@ class Conexion:
         return velocidad_base
     
     def obtener_info_restriccion(self):
-        """Retorna información legible sobre restricciones"""
+        """Genera descripción legible de las restricciones"""
         if not self.restriccion or self.valorRestriccion is None:
             return "Sin restricciones"
         
@@ -88,6 +93,8 @@ class Conexion:
         else:
             return f"{self.restriccion}: {self.valorRestriccion}"
 
+
+# Código de prueba
 if __name__ == "__main__":
     print("Probando conexiones con restricciones...")
     
@@ -104,7 +111,7 @@ if __name__ == "__main__":
         print(f"- {buenos_aires}")
         print(f"- {junin}")
         
-        # Crear conexiones con restricciones
+        # Crear conexiones con diferentes restricciones
         print(f"\nCreando conexiones...")
         
         # Conexión ferroviaria con velocidad máxima
@@ -117,7 +124,7 @@ if __name__ == "__main__":
         print(f"OK {conexion2}")
         print(f"   {conexion2.obtener_info_restriccion()}")
         
-        # Conexión fluvial con tipo
+        # Conexión fluvial con tipo específico
         conexion3 = Conexion(zarate, buenos_aires, "Fluvial", 85, "tipo", "fluvial")
         print(f"OK {conexion3}")
         print(f"   {conexion3.obtener_info_restriccion()}")
@@ -127,7 +134,7 @@ if __name__ == "__main__":
         print(f"OK {conexion4}")
         print(f"   {conexion4.obtener_info_restriccion()}")
         
-        # Probar verificación de carga
+        # Probar compatibilidad con cargas
         print(f"\nProbando cargas:")
         cargas_test = [10000, 20000]
         for carga in cargas_test:
