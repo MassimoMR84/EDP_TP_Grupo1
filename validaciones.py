@@ -99,18 +99,3 @@ def validar_restriccion_conexion(restriccion, valor):
     
     # Para otras restricciones, solo devolver el valor
     return valor
-
-
-# Prueba simple
-if __name__ == "__main__":
-    print("✅ Validaciones simplificadas")
-    
-    # Probar validaciones básicas
-    try:
-        print(f"Positivo: {validar_positivo(10)}")
-        print(f"Mayor cero: {validar_mayor_cero(5)}")
-        print(f"Texto: '{validar_texto('  Buenos Aires  ')}'")
-        print(f"Modo: {validar_modo_transporte('Automotor')}")
-        print("✅ Todas las validaciones funcionan")
-    except Exception as e:
-        print(f"❌ Error: {e}")

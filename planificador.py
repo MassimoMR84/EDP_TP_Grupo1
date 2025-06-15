@@ -308,9 +308,3 @@ class Planificador:
                     todas_las_rutas[modo] = itinerarios_modo
                     
         return todas_las_rutas
-
-
-if __name__ == "__main__":
-    print("Probando planificador...")
-    print("Para pruebas completas, ejecutar main.py con archivos CSV")
-    print("Maneja restricciones de velocidad, peso, tipos de barco y clima")
