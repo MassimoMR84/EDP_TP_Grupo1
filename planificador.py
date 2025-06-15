@@ -9,8 +9,8 @@ class Planificador:
     Maneja restricciones específicas de cada tipo de conexión.
     """   
     
-    def __init__(self, red_transporte):
-        self.red_transporte = red_transporte
+    def __init__(self, sistema_transporte):
+        self.sistema_transporte = sistema_transporte
         
         # Mapeo de tipos de conexión a clases de vehículos
         self.tipos_vehiculos = {
@@ -99,7 +99,7 @@ class Planificador:
         nodo_origen = None
         nodo_destino = None
         
-        for nodo in self.red_transporte.nodos.values():
+        for nodo in self.sistema_transporte.nodos.values():
             if nodo.nombre == origen_nombre:
                 nodo_origen = nodo
             if nodo.nombre == destino_nombre:
@@ -264,7 +264,7 @@ class Planificador:
         nodo_origen = None
         nodo_destino = None
         
-        for nodo in self.red_transporte.nodos.values():
+        for nodo in self.sistema_transporte.nodos.values():
             if nodo.nombre == origen_nombre:
                 nodo_origen = nodo
             if nodo.nombre == destino_nombre:
