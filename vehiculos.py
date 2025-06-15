@@ -1,6 +1,7 @@
 from validaciones import *
 from funciones import *
 from random import random
+from conexion import * 
 
 class Vehiculo:
     '''
@@ -153,7 +154,7 @@ class Barco(Vehiculo):
         self.modo_de_transporte = modo_de_transporte 
 
 class Avion(Vehiculo):
-    def __init__(self, prob_mal_tiempo = 0):
+    def __init__(self, prob_mal_tiempo):
         #velocidad = 600 - 200*prob_mal_tiempo (PREGUNTAR Q FORMA VA)
         super().__init__(velocidad_nominal = 600,
                          capacidad_de_carga = 5000,
@@ -161,6 +162,8 @@ class Avion(Vehiculo):
                          costo_km_recorrido = 40,
                          costo_kg_transportado = 10)        
         self.modo_de_transporte = 'aereo'
+        if prob_mal_tiempo == None:
+            prob_mal_tiempo = 0
         self.prob_mal_tiempo = prob_mal_tiempo
  
     def getVelocidad(self):
