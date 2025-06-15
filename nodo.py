@@ -59,7 +59,7 @@ class Nodo():
                 '''se obtiene el nodo origen del diccionario de nodos'''
                 destino = row['destino'].strip()
                 '''se obtiene el nodo destino del diccionario de nodos'''
-                tipo = row['tipo']
+                tipo = row['tipo'].lower().strip()
                 distancia = float(row['distancia_km'])
                 '''se lo convierte a int porque todos los valores se miden en km y no tienen decimales'''
                 restriccion = row.get('restriccion') or None
