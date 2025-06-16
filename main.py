@@ -41,7 +41,7 @@ def procesar_solicitudes(sistema, planificador):
                 resultados_tiempo[f"{solicitud.id_carga}_tiempo"] = itinerario_tiempo
                 
                 # Gráficos para primera solicitud
-                if i == 1 and GRAFICOS_DISPONIBLES:
+                if GRAFICOS_DISPONIBLES:
                     try:
                         print(f"\nGenerando gráficos por tiempo...")
                         generar_todos_los_graficos(itinerario_tiempo, f"{solicitud.id_carga} - Por Tiempo")
@@ -65,7 +65,7 @@ def procesar_solicitudes(sistema, planificador):
                 resultados_costo[f"{solicitud.id_carga}_costo"] = itinerario_costo
                 
                 # Gráficos para primera solicitud
-                if i == 1 and GRAFICOS_DISPONIBLES:
+                if GRAFICOS_DISPONIBLES:
                     try:
                         print(f"\nGenerando gráficos por costo...")
                         generar_todos_los_graficos(itinerario_costo, f"{solicitud.id_carga} - Por Costo")
