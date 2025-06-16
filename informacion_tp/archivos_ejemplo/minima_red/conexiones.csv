@@ -1,0 +1,5 @@
+origen,destino,tipo,distancia_km,restriccion,valor_restriccion
+Zarate,Buenos_Aires,Ferroviaria,85,velocidad_max,80
+Zarate,Buenos_Aires,Automotor,85,,
+Zarate,Buenos_Aires,Fluvial,85,tipo,fluvial
+Zarate,Buenos_Aires,Aerea,85,prob_mal_tiempo,0.2

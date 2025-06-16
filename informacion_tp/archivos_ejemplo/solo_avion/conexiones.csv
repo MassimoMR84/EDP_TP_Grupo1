@@ -1,0 +1,2 @@
+origen,destino,tipo,distancia_km,restriccion,valor_restriccion
+Zarate,Buenos_Aires,Aerea,85,prob_mal_tiempo,0.2
