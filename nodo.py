@@ -26,23 +26,6 @@ class Nodo():
 
     def agregarConexiones(self, conexion):
         self.conexiones.append(conexion)
-
-    @staticmethod
-    def leer_nodos(path):
-        '''Carga los nodos provenientes de un archivo csv de una columna denominada "nombre"
-        Retorna diccionario de la forma {nombre: objeto_nodo}'''
-        nodos = {} 
-        with open(path, newline='', encoding='utf-8') as f: 
-            '''se abre el csv de nodos, urf-8 para leer el archivo correctamente'''
-            reader = csv.DictReader(f) 
-            '''se convierte cada fila en un diccionario'''
-            for row in reader:
-                '''recorre las filas creadas'''
-                nombre = row['nombre']
-                if nombre not in nodos:
-                    nodos[nombre] = Nodo(nombre) 
-                    '''se crea un nodo si no estaba ya creado'''
-        return nodos
     
     @staticmethod
     def generar_conexiones(path, nodos: dict):
