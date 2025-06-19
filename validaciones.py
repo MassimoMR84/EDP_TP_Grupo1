@@ -1,85 +1,101 @@
-def validar_numero(dato):
-    '''
-    Valida que el dato sea un número (int o float)
-    '''
-    if not isinstance(dato, (int, float)):
-        raise TypeError('Tipo de dato no valido. Debe ser de tipo int o float')
-    return dato
+def validar_positivo(numero):
+    """Verifica que sea >= 0"""
+    if not isinstance(numero, (int, float)):
+        raise TypeError('Debe ser un número')
+    if numero < 0:
+        raise ValueError('Debe ser positivo')
+    return numero
 
 
-def validar_numero_positivo(dato):
-    '''
-    Valida que un numero sea positivo (mayor o igual a cero)
-    '''
-    validar_numero(dato)
-    if dato < 0:
-        raise ValueError('Tipo de dato no valido. Debe ser un numero positivo.')
-    return dato  
+def validar_mayor_cero(numero):
+    """Verifica que sea > 0"""
+    validar_positivo(numero)
+    if numero == 0:
+        raise ValueError('Debe ser mayor a cero')
+    return numero
 
 
-def validar_numero_mayor_a_cero(dato):
-    '''
-    Valida que un numero sea estrictamente mayor a cero
-    '''
-    validar_numero_positivo(dato)
-    if dato == 0:
-        raise ValueError('Numero debe ser estrictamente mayor a cero')
-    return dato
+def validar_texto(texto):
+    """Verifica que sea texto válido"""
+    if not isinstance(texto, str):
+        raise TypeError('Debe ser texto')
+    if not texto.strip():
+        raise ValueError('No puede estar vacío')
+    return texto.strip()
 
 
-def validar_cadena(dato):
-    '''
-    Valida que el dato sea una cadena de texto str
-    '''
-    if not isinstance(dato, str):
-        raise TypeError('Tipo de dato no valido. Debe ser una cadena de texto.')
-    return dato
-
-
-def validar_division_por_cero(denominador):
-    '''
-    Lanza un error si el denominador de una division es cero
-    '''
-    validar_numero_mayor_a_cero(denominador) 
+def validar_division_cero(denominador):
+    """Previene divisiones por cero"""
+    if denominador == 0:
+        raise ValueError('No se puede dividir por cero')
     return denominador
 
 
-'''========== Validaciones de clase Vehiculos =========='''
-
-
-def validar_modo_de_transporte(modo_de_transporte):
-    '''
-    Valida que el modo de transporte sea automotor, ferroviaria, aerea, fluvial
-    '''
-    modo = validar_cadena(modo_de_transporte).strip().lower()
-    if modo not in ['automotor', 'ferroviaria', 'aerea', 'fluvial', 'maritimo']:
-        raise ValueError('Modo de transporte no valido. Debe ser: automotor, ferroviaria, aereo o fluvial.')
-    return modo
-
-
 def validar_vehiculo(vehiculo): 
-    '''
-    Valida que el vehiculo sea un objeto de tipo Vehiculo
-    '''
-    from vehiculos import Vehiculo  # ← Import dentro de la función
+    """Verifica que sea un vehículo válido"""
+    from vehiculos import Vehiculo
     if not isinstance(vehiculo, Vehiculo):
-        raise TypeError("El vehiculo debe ser un objeto de tipo Vehiculo")
+        raise TypeError("Debe ser un vehículo")
     return vehiculo
 
-'''========== Validaciones de clase Solicitudes =========='''
 
 def validar_origen_destino(origen, destino): 
-    '''
-    Valida que el origen y destino no sean iguales
-    '''
+    """Verifica que origen y destino sean diferentes"""
     if origen == destino:
-        raise ValueError("El origen y el destino no pueden ser iguales.")
+        raise ValueError("Origen y destino no pueden ser iguales")
     return origen, destino
 
-'''========== Validaciones de clase Conexiones =========='''
 
-def validarNodo(nodo):
-    from nodo import Nodo  # ← Import dentro de la función
-    if not isinstance(nodo, Nodo):
-        raise TypeError("El origen y destino deben ser objetos de tipo Nodo")
-    return nodo
+def validar_modo_transporte(modo):
+    """Valida y normaliza modos de transporte"""
+    modo = validar_texto(modo).lower()
+    
+    modos_validos = {
+        'automotor': 'automotor',
+        'ferroviaria': 'ferroviaria', 
+        'aerea': 'aerea',
+        'aereo': 'aerea',
+        'fluvial': 'fluvial',
+        'maritimo': 'maritimo',
+        'marítimo': 'maritimo'
+    }
+    
+    if modo not in modos_validos:
+        raise ValueError(f'Modo inválido: {modo}. Usar: automotor, ferroviaria, aerea, fluvial, maritimo')
+    
+    return modos_validos[modo]
+
+
+def validar_restriccion_conexion(restriccion, valor):
+    """Validador simple para restricciones"""
+    if not restriccion or not valor:
+        return valor
+        
+    restriccion = restriccion.strip().lower()
+    
+    # Validaciones básicas según tipo
+    if restriccion in ['velocidad_max', 'peso_max']:
+        try:
+            num = float(valor)
+            if num <= 0:
+                raise ValueError(f"{restriccion} debe ser positivo")
+            return num
+        except ValueError:
+            raise ValueError(f"{restriccion} debe ser un número válido")
+    
+    elif restriccion == 'tipo':
+        if valor.lower() not in ['fluvial', 'maritimo']:
+            raise ValueError("Tipo debe ser 'fluvial' o 'maritimo'")
+        return valor.lower()
+    
+    elif restriccion == 'prob_mal_tiempo':
+        try:
+            prob = float(valor)
+            if not 0 <= prob <= 1:
+                raise ValueError("Probabilidad debe estar entre 0 y 1")
+            return prob
+        except ValueError:
+            raise ValueError("Probabilidad debe ser un número entre 0 y 1")
+    
+    # Para otras restricciones, solo devolver el valor
+    return valor
