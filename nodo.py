@@ -1,13 +1,13 @@
-from validaciones import validar_cadena
+from validaciones import validar_texto
 from conexion import Conexion
 import csv
 
 class Nodo():
+    '''Representa una ciudad de la red'''
 
     def __init__(self, nombre:str):
-        self.nombre = validar_cadena(nombre) #falta validacion
+        self.nombre = validar_texto(nombre)
         self.conexiones=[]
-        #FALTA VALIDAR Q NO SE REPITAN LAS CONEXIONES (puede ser un set y hasheas la conexion)
         '''Las conexiones de un nodo serán aquellos objetos conexión que tengan a ese nodo como origen'''
 
     def __str__(self):  #! Falta explicacion 
@@ -21,16 +21,17 @@ class Nodo():
         return isinstance(otro, Nodo) and self.nombre == otro.nombre
 
     def __hash__(self): 
-        '''Permite que el nodo sea usado como clave en un diccionario o en un set'''
+        '''Permite que el nodo sea usado como clave en un diccionario'''
         return hash(self.nombre)
 
     def agregarConexiones(self, conexion):
         self.conexiones.append(conexion)
 
     @staticmethod
-    def leer_nodos(path):   #! Juntar los lectores en un solo archivo y en una funcion
+    def leer_nodos(path):
+        '''Carga los nodos provenientes de un archivo csv de una columna denominada "nombre"
+        Retorna diccionario de la forma {nombre: objeto_nodo}'''
         nodos = {} 
-        '''diccionario para almacenar los datos: key: nombre del nodo--> value: objeto nodo con ese nombre'''
         with open(path, newline='', encoding='utf-8') as f: 
             '''se abre el csv de nodos, urf-8 para leer el archivo correctamente'''
             reader = csv.DictReader(f) 
@@ -59,11 +60,11 @@ class Nodo():
                 '''se obtiene el nodo origen del diccionario de nodos'''
                 destino = row['destino'].strip()
                 '''se obtiene el nodo destino del diccionario de nodos'''
-                tipo = row['tipo'].lower().strip()
+                tipo = row['tipo']
                 distancia = float(row['distancia_km'])
                 '''se lo convierte a int porque todos los valores se miden en km y no tienen decimales'''
                 restriccion = row.get('restriccion') or None
-                valor = row.get('valor_restriccion') or 0 if restriccion else None
+                valor = row.get('valor_restriccion') or None
                 '''como puede haber restricción o no, valor y restricción pueden llegar a estar vacíos'''
 
                 if origen in nodos and destino in nodos:
@@ -75,11 +76,4 @@ class Nodo():
                     '''se agrega la conexión al nodo origen'''
                 else:
                     raise TypeError(f"Las conexiones no se pudieron agregar a los nodos correspondientes. Nodo faltante: {origen} o {destino}")
-                
-
-'''Prueba de funcionamiento'''
-if __name__=="__main__":
-    nodos=Nodo.leer_nodos("nodos.csv")
-    print(nodos)
-    Nodo.generar_conexiones("conexiones.csv", nodos)
-    print(nodos['Buenos_Aires'].conexiones)
+            
