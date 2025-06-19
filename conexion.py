@@ -85,4 +85,4 @@ class Conexion:
             return f"Tipo de navegación: {self.valorRestriccion}"
         elif self. restriccion == "prob_mal_tiempo":
             return f"Probabilidad de mal tiempo: {float (self.valorRestriccion)*100:.1f}%"
-        else: return f"{self. restriccion}: {self.valorRestriccion}"
+        else: return f"{self.restriccion}: {self.valorRestriccion}"
