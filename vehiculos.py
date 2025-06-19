@@ -216,6 +216,7 @@ class Avion(Vehiculo):
         self.modo_de_transporte = 'aerea'
         self.prob_mal_tiempo = prob_mal_tiempo
  
+    #velocidad = 600 - 200*prob_mal_tiempo (PREGUNTAR Q FORMA VA) (preguntar si no va esta formula)
     def getVelocidad(self):
         """
         Velocidad efectiva considerando clima.
