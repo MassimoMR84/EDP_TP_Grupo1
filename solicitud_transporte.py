@@ -28,25 +28,6 @@ class SolicitudTransporte:
             raise TypeError('Ambos deben ser SolicitudTransporte')
         return self.id_carga == other.id_carga
 
-    @staticmethod   
-    def leer_solicitudes(file):
-        """Lee datos de solicitudes desde CSV como lista de diccionarios"""
-        with open(file,'r',encoding='utf-8') as archivo:
-            lector=csv.DictReader(archivo)
-            return list(lector)
-    
-    @classmethod
-    def cargar_solicitudes(cls,file):
-        #Crea una lista solicitudes que contiene instancias de SolicitudTransporte
-        datos = cls.leer_solicitudes(file)
-        solicitudes=[]
-        for fila in datos:
-            try:
-                solicitud= SolicitudTransporte(id_carga=fila['id_carga'], peso_kg=float(fila['peso_kg']), origen=fila['origen'], destino=fila['destino'])
-                solicitudes.append(solicitud)
-            except Exception as e:
-                print(f"Error en fila {fila}: {e}")
-        return solicitudes
     
 # Código de prueba
 if __name__ == '__main__':
