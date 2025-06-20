@@ -58,6 +58,9 @@ class Vehiculo:
         capacidad = self.capacidad_de_carga
         cargas_por_vehiculo = []
         
+        # Define carga fija por carga transportada
+        costo_total = 0
+        
         # Algoritmo de distribución: llenar cada vehículo al máximo
         while carga > 0:
             if carga >= capacidad:  
@@ -67,15 +70,19 @@ class Vehiculo:
                 cargas_por_vehiculo.append(carga)
                 carga = 0
         
-        # Calcular costo total para todos los vehículos
-        costo_total = 0
-        for carga_vehiculo in cargas_por_vehiculo:
-            costo = (self.costo_fijo_uso + 
-                    self.costo_km_recorrido * distancia + 
-                    self.costo_kg_transportado * carga_vehiculo)
-            costo_total += costo  
+        # Calcular costo total por todos los vehículos
+        cantidad_vehiculos = len(cargas_por_vehiculo)
+        costo = (self.costo_fijo_uso * cantidad_vehiculos + 
+                    self.costo_km_recorrido * distancia * cantidad_vehiculos)
+            
+        costo_total += costo  
      
         return costo_total
+    
+    def calcular_costo_por_carga(self, carga):
+        validar_positivo(carga)
+        costo_carga = self.costo_kg_transportado * carga
+        return costo_carga
     
     def puede_transportar(self, peso_carga=0):
         """Verifica si puede transportar una carga (base: siempre True)"""
@@ -109,24 +116,25 @@ class Tren(Vehiculo):
         capacidad = self.capacidad_de_carga
         cargas_por_vehiculo = []
         
-        # Distribución de carga
-        carga_restante = carga
-        while carga_restante > 0:
-            if carga_restante >= capacidad:  
-                cargas_por_vehiculo.append(capacidad)
-                carga_restante -= capacidad
-            else:
-                cargas_por_vehiculo.append(carga_restante)
-                carga_restante = 0
-        
-        # Calcular costo total
+        # Define carga fija por carga transportada
         costo_total = 0
-        for carga_vehiculo in cargas_por_vehiculo:
-            costo = (self.costo_fijo_uso + 
-                    costo_km * distancia + 
-                    self.costo_kg_transportado * carga_vehiculo)
-            costo_total += costo
+        
+        # Algoritmo de distribución: llenar cada vehículo al máximo
+        while carga > 0:
+            if carga >= capacidad:  
+                cargas_por_vehiculo.append(capacidad)
+                carga -= capacidad
+            else:
+                cargas_por_vehiculo.append(carga)
+                carga = 0
+        
+        # Calcular costo total por todos los vehículos
+        cantidad_vehiculos = len(cargas_por_vehiculo)
+        costo = (self.costo_fijo_uso * cantidad_vehiculos + 
+                    costo_km * distancia * cantidad_vehiculos)
             
+        costo_total += costo  
+     
         return costo_total
 
 
@@ -142,41 +150,37 @@ class Camion(Vehiculo):
                          costo_fijo=30,            # $
                          costo_km=5,               # $/km
                          costo_kg=1)               # $/kg
-        self.modo_de_transporte = 'automotor'    
-       
-    def calcular_costo_tramo(self, distancia, carga):
-        """Dobla el costo por kg para cargas pesadas (>15 toneladas)"""
-        validar_positivo(distancia)
-        validar_positivo(carga)    
-        
-        # CORREGIDO: Usar variable local en lugar de modificar self
-        costo_kg = self.costo_kg_transportado
-        if carga > 15000:
-            costo_kg = self.costo_kg_transportado * 2  # Sobrecargo 100%
-        
+        self.modo_de_transporte = 'automotor'  
+    
+    def calcular_costo_por_carga(self, carga):
+        validar_positivo(carga)
+    
         capacidad = self.capacidad_de_carga
         cargas_por_vehiculo = []
         
-        # Distribución de carga
-        carga_restante = carga
-        while carga_restante > 0:
-            if carga_restante >= capacidad:  
-                cargas_por_vehiculo.append(capacidad)
-                carga_restante -= capacidad
-            else:
-                cargas_por_vehiculo.append(carga_restante)
-                carga_restante = 0
-        
-        # Calcular costo total
+        # Define carga fija por carga transportada
         costo_total = 0
-        for carga_vehiculo in cargas_por_vehiculo:
-            costo = (self.costo_fijo_uso + 
-                    self.costo_km_recorrido * distancia + 
-                    costo_kg * carga_vehiculo)
-            costo_total += costo
-            
+        
+        # Algoritmo de distribución: llenar cada vehículo al máximo
+        while carga > 0:
+            if carga >= capacidad:  
+                cargas_por_vehiculo.append(capacidad)
+                carga -= capacidad
+            else:
+                cargas_por_vehiculo.append(carga)
+                carga = 0
+        
+        #Calcular costo por kg transportado por vehciulo
+        costo_kg = self.costo_kg_transportado
+        for carga_camion in cargas_por_vehiculo:
+            if carga_camion > 15000:
+                costo_kg = self.costo_kg_transportado*2  #Sobrecargo 100%
+            else: 
+                costo_kg = self.costo_kg_transportado
+            costo_total += carga_camion*costo_kg 
+                
         return costo_total
-
+        
 
 class Barco(Vehiculo):
     """
@@ -224,7 +228,7 @@ class Avion(Vehiculo):
         if random() <= self.prob_mal_tiempo:
             return 400  # Velocidad reducida por mal tiempo
         else:
-            return 600  # Velocidad nominal
+            return self.velocidad_nominal  # Velocidad nominal
 
 
 # Código de prueba

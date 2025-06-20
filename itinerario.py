@@ -115,7 +115,16 @@ class Itinerario:
     
     def calcular_totales(self):
         """Recalcula totales sumando todos los tramos"""
-        self.costo_total = sum(tramo.costo for tramo in self.tramos)
+        #Calcular costo total
+        self.costo_total = 0
+        
+        #Sumamos los costos varibles por tramo
+        self.costo_total += sum(tramo.costo for tramo in self.tramos)
+        
+        #Sumamos los costos de carga por transportar
+        self.costo_total += self.tramos[0].vehiculo.calcular_costo_por_carga(self.carga_solicitud)
+        
+        #Calcular tiempo total
         self.tiempo_total = sum(tramo.tiempo for tramo in self.tramos)
     
     def obtener_distancia_total(self):

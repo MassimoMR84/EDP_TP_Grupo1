@@ -45,9 +45,7 @@ class Conexion:
         
         '''Si hay una restricción de velocidad máxima (para trenes)'''
         if self.restriccion=="velocidad_max":
-            if hasattr(vehiculo, "velocidad_nominal"):
-                return vehiculo.velocidad_nominal<=float(self.valorRestriccion)
-            return True
+            return vehiculo.velocidad_nominal<=float(self.valorRestriccion)
         
         return True 
     '''El resto de las restricciones se manejan en el planificador'''

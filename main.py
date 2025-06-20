@@ -1,6 +1,7 @@
 from sistema_transporte import SistemaTransporte
 from planificador import Planificador
 from datetime import datetime
+import os
 
 # Importar gráficos si matplotlib está disponible
 try:
@@ -10,6 +11,7 @@ except ImportError:
     print("Matplotlib no disponible - gráficos deshabilitados")
     GRAFICOS_DISPONIBLES = False
 
+os.makedirs('output',exist_ok=True)
 
 def procesar_solicitudes(sistema, planificador):
     """
@@ -249,7 +251,7 @@ def main():
         # Exportar resumen detallado
         try:
             timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
-            sistema.exportar_resumen(f"resumen_ejecucion_{timestamp}.txt")
+            sistema.exportar_resumen(f"output/resumen_ejecucion_{timestamp}.txt")
             print(f"Resumen exportado: resumen_ejecucion_{timestamp}.txt")
         except Exception as e:
             print(f"Advertencia: No se pudo exportar resumen: {e}")

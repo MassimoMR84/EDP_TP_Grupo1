@@ -1,3 +1,4 @@
+from planificador import *
 # Manejo de dependencias opcionales
 try:
     import matplotlib.pyplot as plt
@@ -23,7 +24,7 @@ def _crear_nombre_archivo(prefijo, sufijo=""):
     if sufijo:
         nombre += f"_{sufijo}"
     nombre += f"_{timestamp}"
-    return f"{nombre}.png"
+    return f"output/{nombre}.png"
 
 
 def grafico_distancia_vs_tiempo(itinerario):
@@ -200,7 +201,6 @@ def grafico_comparacion_caminos(itinerarios_dict):
     print(f"Gráfico comparativo de costos guardado: {nombre_archivo}")
     
     plt.show()
-
 
 def grafico_comparacion_tiempos(itinerarios_dict):
     """

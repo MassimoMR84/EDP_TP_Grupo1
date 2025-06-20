@@ -69,7 +69,7 @@ class Planificador:
         if recorrido is None:
             recorrido = []
 
-        recorrido = recorrido.append(nodo_actual)
+        recorrido = recorrido + [nodo_actual]
 
         # Caso base: llegamos al destino
         if nodo_actual == destino:
@@ -138,8 +138,8 @@ class Planificador:
                         mejor_valor = valor_kpi
                         mejor_itinerario = itinerario
                         
-            if mejor_itinerario:
-                print("✔ Mejor ruta encontrada:", " -> ".join(mejor_itinerario.obtener_ruta_completa()))
+        if mejor_itinerario:
+            print("✔ Mejor ruta encontrada:", " -> ".join(mejor_itinerario.obtener_ruta_completa()))
 
         return mejor_itinerario
     
