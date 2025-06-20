@@ -86,7 +86,65 @@ class Planificador:
                     caminos.extend(nuevos_caminos)
 
         return caminos
+    
+    def encontrar_ruta_optima(self, solicitud, kpi="costo"):
+        # Obtener nodos de origen y destino
+        origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
+        destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
+        
+        nodo_origen = None
+        nodo_destino = None
+        
+        for nodo in self.sistema_transporte.nodos.values():
+            if nodo.nombre == origen_nombre:
+                nodo_origen = nodo
+            if nodo.nombre == destino_nombre:
+                nodo_destino = nodo
+                
+        if not nodo_origen or not nodo_destino:
+            raise ValueError(f"Nodos no encontrados: {origen_nombre} o {destino_nombre}")
+        
+        carga = solicitud.peso_kg
+        
+        modos_disponibles = list(self.vehiculos_disponibles)
+        mejor_itinerario = None
+        mejor_valor = float('inf')
+        
+        for modo in modos_disponibles:
+            rutas = self.buscar_rutas(nodo_origen, nodo_destino, modo)
+            
+            #Convertir rutas de nodos a itinerario
+            for ruta in rutas:
+                conexiones = []
+                for i in range(len(ruta) - 1):
+                    nodo_origen_tramo = ruta[i]
+                    nodo_destino_tramo = ruta[i + 1]
 
+                    # Buscar la conexión válida para ese tramo
+                    for conexion in nodo_origen_tramo.conexiones:
+                        if (conexion.destino == nodo_destino_tramo and 
+                            conexion.tipo.lower() == modo.lower() and 
+                            self._verificar_restricciones(conexion, carga)):
+                            conexiones.append(conexion)
+                            break
+
+                #Construir todas las conexiones
+                if len(conexiones) == len(ruta) - 1:
+                    itinerario = self._construir_itinerario_con_conexiones(conexiones, carga, kpi)
+                    valor_kpi = itinerario.tiempo_total if kpi == "tiempo" else itinerario.costo_total
+
+                    #Analiza para cada ruta de cada modo si su valor segun el kpi determinado es menor
+                    if valor_kpi < mejor_valor:
+                        mejor_valor = valor_kpi
+                        mejor_itinerario = itinerario
+                        
+            if mejor_itinerario:
+                print("✔ Mejor ruta encontrada:", " -> ".join(mejor_itinerario.obtener_ruta_completa()))
+
+        return mejor_itinerario
+
+
+    '''
     def encontrar_ruta_optima(self, solicitud, kpi="tiempo"):
         """
         Encuentra la ruta óptima probando todos los modos de transporte.
@@ -133,7 +191,9 @@ class Planificador:
             mejor = min(mejores_rutas.values(), key=lambda x: x.costo_total)
             
         return mejor
+    '''
     
+    '''
     def _dijkstra(self, origen, destino, modo, peso_carga, kpi):
         """
         Implementación de Dijkstra para encontrar camino óptimo.
@@ -200,6 +260,7 @@ class Planificador:
                             print(f"Error procesando conexión: {e}")
         
         return None
+    '''
     
     def _verificar_restricciones(self, conexion, peso_carga):
         """
@@ -252,6 +313,7 @@ class Planificador:
             print(f"Error generando itinerario: {e}")
             return None
     
+    '''
     def encontrar_todas_las_rutas(self, solicitud):
         """
         Encuentra todas las rutas posibles en todos los modos de transporte.
@@ -308,3 +370,4 @@ class Planificador:
                     todas_las_rutas[modo] = itinerarios_modo
                     
         return todas_las_rutas
+        '''
