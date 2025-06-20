@@ -154,7 +154,7 @@ def grafico_costo_vs_distancia(itinerario):
     plt.show()
 
 
-def grafico_comparacion_caminos(itinerarios_dict):
+'''def grafico_comparacion_caminos(itinerarios_optimos_por_modo):
     """
     Gráfico de barras comparando costos entre diferentes rutas.
     Permite evaluar rápidamente qué itinerarios son más económicos.
@@ -162,13 +162,13 @@ def grafico_comparacion_caminos(itinerarios_dict):
     if not verificar_matplotlib():
         return
         
-    if not itinerarios_dict:
+    if not itinerarios_optimos_por_modo:
         print("No hay itinerarios para comparar")
         return
         
     # Extraer datos
-    nombres = list(itinerarios_dict.keys())
-    costos = [itinerario.costo_total for itinerario in itinerarios_dict.values()]
+    nombres = list(itinerarios_optimos_por_modo.keys())
+    costos = [itinerario.costo_total for itinerario in itinerarios_optimos_por_modo.values()]
     
     # Crear gráfico de barras
     plt.figure(figsize=(12, 6))
@@ -202,7 +202,7 @@ def grafico_comparacion_caminos(itinerarios_dict):
     
     plt.show()
 
-def grafico_comparacion_tiempos(itinerarios_dict):
+def grafico_comparacion_tiempos(itinerarios_optimos_por_modo):
     """
     Gráfico de barras comparando tiempos entre diferentes rutas.
     Útil para optimización temporal.
@@ -210,13 +210,13 @@ def grafico_comparacion_tiempos(itinerarios_dict):
     if not verificar_matplotlib():
         return
         
-    if not itinerarios_dict:
+    if not itinerarios_optimos_por_modo:
         print("No hay itinerarios para comparar")
         return
         
     # Extraer datos
-    nombres = list(itinerarios_dict.keys())
-    tiempos = [itinerario.tiempo_total for itinerario in itinerarios_dict.values()]
+    nombres = list(itinerarios_optimos_por_modo.keys())
+    tiempos = [itinerario.tiempo_total for itinerario in itinerarios_optimos_por_modo.values()]
     
     # Crear gráfico
     plt.figure(figsize=(12, 6))
@@ -252,6 +252,41 @@ def grafico_comparacion_tiempos(itinerarios_dict):
     
     plt.show()
 
+'''
+
+def grafico_tiempo_vs_distancia_por_modo(itinerarios_optimos_por_modo, mejor_itinerario):
+    if not itinerarios_optimos_por_modo:
+        print("No hay itinerarios para graficar.")
+        return
+
+    plt.figure(figsize=(12, 6))
+
+    for modo, itinerario in itinerarios_optimos_por_modo.items():
+        tiempos = [0]
+        distancias = [0]
+        tiempo_acumulado = 0
+        distancia_acumulada = 0
+
+        for tramo in itinerario.tramos:
+            tiempo_acumulado += tramo.tiempo * 60  # pasa a minutos
+            distancia_acumulada += tramo.distancia
+            tiempos.append(tiempo_acumulado)
+            distancias.append(distancia_acumulada)
+
+        if itinerario == mejor_itinerario:
+            plt.plot(tiempos, distancias, label=f"{modo} (óptimo)", linewidth=3, color='gold')
+        else:
+            plt.plot(tiempos, distancias, label=modo, linewidth=1.8)
+
+    plt.xlabel("Tiempo Acumulado (min)")
+    plt.ylabel("Distancia Acumulada (km)")
+    plt.title("Comparación de Itinerarios Óptimos por Modo")
+    plt.legend()
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    plt.show()
+
+
 
 def generar_todos_los_graficos(itinerario, nombre_itinerario="Itinerario"):
     """
@@ -266,6 +301,7 @@ def generar_todos_los_graficos(itinerario, nombre_itinerario="Itinerario"):
     try:
         grafico_distancia_vs_tiempo(itinerario)
         grafico_costo_vs_distancia(itinerario)
+        grafico_tiempo_vs_distancia_por_modo(Planificador.optimos_por_modo(), Planificador.generar_itinerario())
         print("Gráficos generados correctamente")
     except Exception as e:
         print(f"Error generando gráficos: {e}")

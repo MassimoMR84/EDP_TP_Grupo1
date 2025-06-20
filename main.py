@@ -5,7 +5,7 @@ import os
 
 # Importar gráficos si matplotlib está disponible
 try:
-    from graficos import generar_todos_los_graficos, grafico_comparacion_caminos, grafico_comparacion_tiempos
+    from graficos import generar_todos_los_graficos, grafico_tiempo_vs_distancia_por_modo
     GRAFICOS_DISPONIBLES = True
 except ImportError:
     print("Matplotlib no disponible - gráficos deshabilitados")
@@ -49,6 +49,16 @@ def procesar_solicitudes(sistema, planificador):
                         generar_todos_los_graficos(itinerario_tiempo, f"{solicitud.id_carga} - Por Tiempo")
                     except Exception as e:
                         print(f"Error en gráficos: {e}")
+                        
+                # Gráfico de comparación entre modos
+                if GRAFICOS_DISPONIBLES:
+                    try:
+                        print("\nGenerando gráfico comparativo de tiempo vs distancia por modo...")
+                        mejor_it, itinerarios_por_modo = planificador.encontrar_ruta_optima(solicitud, kpi="costo")
+                        grafico_tiempo_vs_distancia_por_modo(itinerarios_por_modo, mejor_it)
+                    except Exception as e:
+                        print(f"Error al generar gráfico comparativo de líneas: {e}")
+                                      
             else:
                 print("No se encontró ruta válida")
         except Exception as e:
@@ -148,6 +158,7 @@ def procesar_solicitudes(sistema, planificador):
         
         print("\n" + "="*60)
     
+    '''
     # Gráficos comparativos finales
     if GRAFICOS_DISPONIBLES and (len(resultados_tiempo) > 1 or len(resultados_costo) > 1):
         try:
@@ -158,7 +169,7 @@ def procesar_solicitudes(sistema, planificador):
                 grafico_comparacion_caminos(resultados_costo)
         except Exception as e:
             print(f"Error en gráficos comparativos: {e}")
-
+    '''
 
 def mostrar_estadisticas_detalladas(sistema):
     """

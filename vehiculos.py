@@ -95,14 +95,19 @@ class Tren(Vehiculo):
     Aplica descuentos por distancia (economías de escala).
     """
     
-    def __init__(self):
-        super().__init__(velocidad_nominal=100,   # km/h
+    def __init__(self,velocidad=100):
+        try:
+            velocidad=float(velocidad)
+        except TypeError:
+            velocidad=100.0
+            
+        super().__init__(velocidad_nominal=velocidad,   # km/h
                          capacidad_carga=150000,  # kg - muy alta capacidad
                          costo_fijo=100,          # $
                          costo_km=20,             # $/km
                          costo_kg=3)              # $/kg
         self.modo_de_transporte = 'ferroviaria'
-   
+
     def calcular_costo_tramo(self, distancia, carga):
         """Aplica descuento del 25% para distancias largas (>200km)"""
         validar_positivo(distancia)

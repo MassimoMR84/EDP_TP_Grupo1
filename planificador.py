@@ -27,16 +27,7 @@ class Planificador:
         tipo = conexion.tipo.lower()
         
         if tipo == 'ferroviaria':
-            vehiculo = Tren()
-            # Aplicar restricción de velocidad si existe
-            if conexion.restriccion == 'velocidad_max' and conexion.valorRestriccion:
-                try:
-                    velocidad_max = float(conexion.valorRestriccion)
-                    if vehiculo.velocidad_nominal > velocidad_max:
-                        vehiculo.velocidad_nominal = velocidad_max
-                except (ValueError, TypeError):
-                    pass
-            return vehiculo
+            return Tren(velocidad=conexion.valorRestriccion)
             
         elif tipo == 'automotor':
             return Camion()
@@ -87,7 +78,12 @@ class Planificador:
         return caminos
     
     def encontrar_ruta_optima(self, solicitud, kpi="costo"):
-        """Encuentra la ruta óptima probando todos los modos de transporte"""
+        """
+        Devuelve:
+        - mejor_itinerario (Itinerario): el más óptimo según el KPI
+        - itinerarios_optimos_por_modo (dict[str, Itinerario]): los mejores por cada modo
+        """
+
         # Obtener nodos de origen y destino
         origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
         destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
@@ -109,9 +105,12 @@ class Planificador:
         modos_disponibles = list(self.vehiculos_disponibles)
         mejor_itinerario = None
         mejor_valor = float('inf')
+        itinerarios_optimos_por_modo = {}
         
         for modo in modos_disponibles:
             rutas = self.buscar_rutas(nodo_origen, nodo_destino, modo)
+            mejor_itinerario_por_modo = None
+            mejor_valor_modo = float('inf')
             
             #Convertir rutas de nodos a itinerario
             for ruta in rutas:
@@ -133,15 +132,21 @@ class Planificador:
                     itinerario = self._construir_itinerario_con_conexiones(conexiones, carga, kpi)
                     valor_kpi = itinerario.tiempo_total if kpi == "tiempo" else itinerario.costo_total
 
-                    #Analiza para cada ruta de cada modo si su valor segun el kpi determinado es menor
-                    if valor_kpi < mejor_valor:
-                        mejor_valor = valor_kpi
-                        mejor_itinerario = itinerario
+                    #Analiza para cada modo si su valor segun el kpi es el mejor
+                    if valor_kpi < mejor_valor_modo:
+                        mejor_valor_modo = valor_kpi
+                        mejor_itinerario_por_modo = itinerario
                         
-        if mejor_itinerario:
-            print("✔ Mejor ruta encontrada:", " -> ".join(mejor_itinerario.obtener_ruta_completa()))
+            if mejor_itinerario_por_modo:
+                itinerarios_optimos_por_modo[modo] = mejor_itinerario_por_modo
+                
+                #Analizo si es el mejor entre todos los modos posibles
+                if mejor_valor_modo < mejor_valor:
+                    mejor_valor = mejor_valor_modo
+                    mejor_itinerario = mejor_itinerario_por_modo
+                        
 
-        return mejor_itinerario
+        return mejor_itinerario, itinerarios_optimos_por_modo
     
     def _verificar_restricciones(self, conexion, peso_carga):
         """
@@ -189,7 +194,16 @@ class Planificador:
         Punto de entrada usado por otros módulos.
         """
         try:
-            return self.encontrar_ruta_optima(solicitud, kpi)
+            aux,_ = self.encontrar_ruta_optima(solicitud,kpi)
+            return aux
+        except Exception as e:
+            print(f"Error generando itinerario: {e}")
+            return None
+        
+    def optimos_por_modo(self, solicitud, kpi='tiempo'):
+        try: 
+            _,dicc = self.encontrar_ruta_optima(solicitud,kpi)
+            return dicc
         except Exception as e:
             print(f"Error generando itinerario: {e}")
             return None
