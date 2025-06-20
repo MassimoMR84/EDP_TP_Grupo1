@@ -70,7 +70,7 @@ class Planificador:
         if recorrido is None:
             recorrido = []
 
-        recorrido = recorrido + [nodo_actual]
+        recorrido = recorrido.append(nodo_actual)
 
         # Caso base: llegamos al destino
         if nodo_actual == destino:
@@ -84,7 +84,7 @@ class Planificador:
                 if siguiente_nodo not in recorrido:
                     nuevos_caminos = self.buscar_rutas(siguiente_nodo, destino, modo, recorrido)
                     caminos.extend(nuevos_caminos)
-
+        
         return caminos
 
     def encontrar_ruta_optima(self, solicitud, kpi="tiempo"):
