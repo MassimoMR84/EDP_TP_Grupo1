@@ -1,7 +1,6 @@
 from nodo import Nodo
 from itinerario import Itinerario, Tramo
 from vehiculos import Vehiculo, Camion, Tren, Barco, Avion
-import heapq
 
 class Planificador: 
     """
@@ -88,6 +87,7 @@ class Planificador:
         return caminos
     
     def encontrar_ruta_optima(self, solicitud, kpi="costo"):
+        """Encuentra la ruta óptima probando todos los modos de transporte"""
         # Obtener nodos de origen y destino
         origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
         destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
@@ -142,125 +142,6 @@ class Planificador:
                 print("✔ Mejor ruta encontrada:", " -> ".join(mejor_itinerario.obtener_ruta_completa()))
 
         return mejor_itinerario
-
-
-    '''
-    def encontrar_ruta_optima(self, solicitud, kpi="tiempo"):
-        """
-        Encuentra la ruta óptima probando todos los modos de transporte.
-        Usa Dijkstra para cada modo y selecciona el mejor según KPI.
-        """
-        # Obtener nodos de origen y destino
-        origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
-        destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
-        
-        nodo_origen = None
-        nodo_destino = None
-        
-        for nodo in self.sistema_transporte.nodos.values():
-            if nodo.nombre == origen_nombre:
-                nodo_origen = nodo
-            if nodo.nombre == destino_nombre:
-                nodo_destino = nodo
-                
-        if not nodo_origen or not nodo_destino:
-            raise ValueError(f"Nodos no encontrados: {origen_nombre} o {destino_nombre}")
-        
-        mejores_rutas = {}
-        
-        # Probar cada modo de transporte
-        modos_disponibles = ['Ferroviaria', 'Automotor', 'Fluvial', 'Aerea']
-        for modo in modos_disponibles:
-            try:
-                ruta_conexiones = self._dijkstra(nodo_origen, nodo_destino, modo, solicitud.peso_kg, kpi)
-                if ruta_conexiones:
-                    # Pasar la carga real de la solicitud
-                    itinerario = self._construir_itinerario_con_conexiones(
-                        ruta_conexiones, solicitud.peso_kg, kpi)
-                    mejores_rutas[modo] = itinerario
-            except Exception as e:
-                print(f"Error calculando ruta para {modo}: {e}")
-                
-        if not mejores_rutas:
-            return None
-            
-        # Seleccionar mejor según KPI
-        if kpi == "tiempo":
-            mejor = min(mejores_rutas.values(), key=lambda x: x.tiempo_total)
-        else:
-            mejor = min(mejores_rutas.values(), key=lambda x: x.costo_total)
-            
-        return mejor
-    '''
-    
-    '''
-    def _dijkstra(self, origen, destino, modo, peso_carga, kpi):
-        """
-        Implementación de Dijkstra para encontrar camino óptimo.
-        Usa cola de prioridad para eficiencia O((V+E) log V).
-        """
-        # Verificar que origen tenga conexiones del modo especificado
-        tiene_conexion_origen = any(conexion.tipo.lower() == modo.lower() 
-                                  for conexion in origen.conexiones)
-        if not tiene_conexion_origen:
-            return None
-        
-        # Estructuras para Dijkstra
-        distancias = {origen: 0}
-        predecesores = {origen: None}
-        conexiones_usadas = {origen: None}
-        visitados = set()
-        heap = [(0, origen)]  # Cola de prioridad
-        
-        while heap:
-            distancia_actual, nodo_actual = heapq.heappop(heap)
-            
-            if nodo_actual in visitados:
-                continue
-                
-            visitados.add(nodo_actual)
-            
-            # Si llegamos al destino, reconstruir camino
-            if nodo_actual == destino:
-                ruta_conexiones = []
-                nodo = destino
-                while conexiones_usadas[nodo] is not None:
-                    ruta_conexiones.append(conexiones_usadas[nodo])
-                    nodo = predecesores[nodo]
-                return ruta_conexiones[::-1]  # Invertir para orden correcto
-            
-            # Explorar conexiones adyacentes
-            for conexion in nodo_actual.conexiones:
-                if (conexion.tipo.lower() == modo.lower() and 
-                    conexion.destino not in visitados):
-                    
-                    if self._verificar_restricciones(conexion, peso_carga):
-                        try:
-                            vehiculo = self._crear_vehiculo_para_conexion(conexion)
-                            
-                            # Calcular costo según KPI
-                            if kpi == "tiempo":
-                                costo_tramo = vehiculo.calcular_tiempo_decimal(conexion.distancia)
-                            else:
-                                # CORREGIDO: Usar método que existe
-                                costo_tramo = vehiculo.calcular_costo_tramo(conexion.distancia, peso_carga)
-                            
-                            nueva_distancia = distancia_actual + costo_tramo
-                            
-                            # Actualizar si encontramos mejor camino
-                            if (conexion.destino not in distancias or 
-                                nueva_distancia < distancias[conexion.destino]):
-                                
-                                distancias[conexion.destino] = nueva_distancia
-                                predecesores[conexion.destino] = nodo_actual
-                                conexiones_usadas[conexion.destino] = conexion
-                                heapq.heappush(heap, (nueva_distancia, conexion.destino))
-                                
-                        except Exception as e:
-                            print(f"Error procesando conexión: {e}")
-        
-        return None
-    '''
     
     def _verificar_restricciones(self, conexion, peso_carga):
         """
@@ -312,62 +193,3 @@ class Planificador:
         except Exception as e:
             print(f"Error generando itinerario: {e}")
             return None
-    
-    '''
-    def encontrar_todas_las_rutas(self, solicitud):
-        """
-        Encuentra todas las rutas posibles en todos los modos de transporte.
-        Útil para análisis y comparación de alternativas.
-        """
-        origen_nombre = solicitud.origen if isinstance(solicitud.origen, str) else solicitud.origen.nombre
-        destino_nombre = solicitud.destino if isinstance(solicitud.destino, str) else solicitud.destino.nombre
-        
-        # Buscar nodos
-        nodo_origen = None
-        nodo_destino = None
-        
-        for nodo in self.sistema_transporte.nodos.values():
-            if nodo.nombre == origen_nombre:
-                nodo_origen = nodo
-            if nodo.nombre == destino_nombre:
-                nodo_destino = nodo
-                
-        if not nodo_origen or not nodo_destino:
-            return {}
-        
-        todas_las_rutas = {}
-        modos_disponibles = ['Ferroviaria', 'Automotor', 'Fluvial', 'Aerea']
-        
-        for modo in modos_disponibles:
-            rutas_modo = self.buscar_rutas(nodo_origen, nodo_destino, modo)
-            if rutas_modo:
-                itinerarios_modo = []
-                
-                # Convertir rutas de nodos a itinerarios
-                for ruta in rutas_modo:
-                    try:
-                        conexiones = []
-                        for i in range(len(ruta) - 1):
-                            nodo_origen_tramo = ruta[i]
-                            nodo_destino_tramo = ruta[i + 1]
-                            
-                            # Buscar conexión correcta
-                            for conexion in nodo_origen_tramo.conexiones:
-                                if (conexion.destino == nodo_destino_tramo and 
-                                    conexion.tipo.lower() == modo.lower() and
-                                    self._verificar_restricciones(conexion, solicitud.peso_kg)):
-                                    conexiones.append(conexion)
-                                    break
-                        
-                        if len(conexiones) == len(ruta) - 1:
-                            itinerario = self._construir_itinerario_con_conexiones(
-                                conexiones, solicitud.peso_kg, "costo")
-                            itinerarios_modo.append(itinerario)
-                    except Exception:
-                        pass  # Saltar rutas con errores
-                        
-                if itinerarios_modo:
-                    todas_las_rutas[modo] = itinerarios_modo
-                    
-        return todas_las_rutas
-        '''
