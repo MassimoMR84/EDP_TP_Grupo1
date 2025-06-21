@@ -2,53 +2,22 @@
 Sistema de Transporte
 # Sistema de Transporte - Grupo 1
 
-## ¿Qué hace este proyecto?
+## ¿Qué hace nuestro proyecto?
 
-Este sistema encuentra la **mejor ruta** para transportar carga entre ciudades de Argentina. Puedes optimizar por:
-- ** Tiempo más rápido** 
-- ** Costo más barato** 
+Este sistema encuentra la ruta más rápida y la más barata para transportar carga entre nodos que representan algunas ciudades de Argentina. 
 
-El sistema considera los siguientes tipos de transporte: camiones, trenes, barcos y aviones.
+El sistema considera los siguientes modos de transporte: camiones, trenes, barcos y aviones.
 
-## 🚀 Cómo ejecutar el programa
+Priorizamos la legibilidad y la modularidad del proyecto, por esto armamos una gran cantidad de archivos, intentando separar o seccionar el código lo más posible, acorde a los principios de la programación orientada a objetos.
 
-### Requisitos
-- Python 3.6 o superior
-- Archivos CSV con los datos (incluidos en el proyecto)
+## Funcionamiento
 
-### Ejecución básica
-```bash
-python main.py
-```
+Paso 1: carga de datos desde los archivos CSV
+Paso 2: Análisis de todas las rutas posibles entre ciudades
+Paso 3: Encuentra la mejor opción usando algoritmos 
+Paso 4: Muestra los resultados de la optimización de tiempo y costo
 
-### Para ver gráficos (opcional)
-```bash
-pip install matplotlib
-python main.py
-```
 
-## 📁 Archivos importantes
-
-- **`main.py`** - Ejecuta todo el sistema
-- **`nodos.csv`** - Lista de ciudades
-- **`conexiones.csv`** - Rutas entre ciudades con restricciones
-- **`solicitudes.csv`** - Qué cargas transportar
-
-## 🎯 Cómo funciona
-
-1. **Carga los datos** desde los archivos CSV
-2. **Analiza todas las rutas** posibles entre ciudades
-3. **Encuentra la mejor opción** usando algoritmos inteligentes
-4. **Muestra el resultado** con detalles de tiempo y costo
-
-## 🚗 Tipos de vehículos
-
-| Vehículo | Velocidad | Capacidad  | Mejor para    |
-|----------|-----------|----------- |-------------- |
-|  Camión  | 80 km/h   | 30,000 kg  | Flexibilidad  |
-|  Tren    | 100 km/h  | 150,000 kg | Cargas pesadas|
-|  Barco   | 40 km/h   | 100,000 kg | Costo bajo    |
-|  Avión   | 600 km/h  | 5,000 kg   | Urgente       |
 
 ## 📋 Ejemplo de resultado
 
@@ -63,16 +32,16 @@ TOTAL: Tiempo: 4h 41min | Costo: $959.60
 ## 🔧 Estructura del código
 
 ### Clases principales
-- **`Vehiculo`** - Comportamiento común (tiempo, costo)
-  - `Tren` - Descuentos por distancia
-  - `Camion` - Sobrecosto por peso
-  - `Barco` - Diferencia fluvial/marítimo
-  - `Avion` - Afectado por clima
+  - `Vehiculo` - abarca todos los comportamientos y atributos comúnes entre vehículos
+    - `Tren` - hereda de la clase vehículo y contempla descuentos por distancia
+    - `Camion` - hereda de la clase vehículo y contempla sobrecosto por peso
+    - `Barco` - hereda de la clase vehículo y contempla la diferencia fluvial/marítimo
+    - `Avion` - hereda de la clase vehículo y contempla los efectos adversos por clima
 
-- **`Nodo`** - Representa una ciudad
-- **`Conexion`** - Ruta entre ciudades con restricciones
-- **`Planificador`** - Encuentra rutas óptimas
-- **`Itinerario`** - Resultado final del viaje
+- `Nodo` - representa una ciudad, un punto en el mapa
+- `Conexion` - representa una ruta entre nodos e incluye atributos como la distancia y la restricción (si la hay)
+- **`Planificador`** - construye y compara las rutas posibles y encuentra las óptimas
+- **`Itinerario`** - presenta el resultado final del viaje
 
 ### Restricciones que maneja
 - **Velocidad máxima** en ciertos tramos de tren
@@ -80,14 +49,9 @@ TOTAL: Tiempo: 4h 41min | Costo: $959.60
 - **Tipo de navegación** (río vs océano)
 - **Probabilidad de mal tiempo** para aviones
 
-## Gráficos (si tienes matplotlib)
 
-El sistema puede generar gráficos para visualizar:
-- Progreso del viaje (distancia vs tiempo)
-- Costo acumulado por kilómetro
-- Comparación entre diferentes rutas
 
-## Casos especiales que resuelve
+
 
 ### Cargas muy pesadas
 Si una carga es muy pesada para un solo vehículo, automáticamente usa varios:
@@ -110,21 +74,7 @@ Los aviones pueden ir más lento si hay mal tiempo:
 3. **Optimización dual** - Mismo algoritmo para tiempo y costo
 4. **Manejo de errores** - ¿Qué pasa si faltan archivos o datos incorrectos?
 
-### Decisiones técnicas importantes
-- Usamos **Dijkstra** porque garantiza la mejor solución
-- **Llenar vehículos** al máximo antes de agregar otro (más realista)
-- **Validar todo** antes de procesar (evita errores raros)
-- **Gráficos opcionales** (funciona sin matplotlib)
 
-## Empezar rápido
 
-1. Descargar el proyecto
-2. Ejecutar `python main.py`
-3. Ver los resultados en pantalla
-4. (Opcional) Instalar matplotlib para gráficos
-
-¡Eso es todo! El sistema hace el resto automáticamente.
-
----
 
 **Hecho con por Grupo 1 - Estructura de Datos y Programación**
