@@ -2,13 +2,12 @@
 Sistema de Transporte
 # Sistema de Transporte - Grupo 1
 
-## ¿Qué hace nuestro proyecto?
+## Objeivo del proyecto
 
-Este sistema encuentra la ruta más rápida y la más barata para transportar carga entre nodos que representan algunas ciudades de Argentina. 
+Encontrar un sistema que encuentre la mejor ruta para transportar carga entre ciudades de Argentina. La "mejor ruta" puede definirse de dos formas:
+- La que se recorra en menos tiempo (optimización por tiempo)
+- La que tenga el costo más bajo (optimización por costo)
 
-El sistema considera los siguientes modos de transporte: camiones, trenes, barcos y aviones.
-
-Priorizamos la legibilidad y la modularidad del proyecto, por esto armamos una gran cantidad de archivos, intentando separar o seccionar el código lo más posible, acorde a los principios de la programación orientada a objetos.
 
 ## Funcionamiento
 
@@ -18,8 +17,7 @@ Paso 3: Encuentra la mejor opción usando algoritmos
 Paso 4: Muestra los resultados de la optimización de tiempo y costo
 
 
-
-## 📋 Ejemplo de resultado
+## Ejemplo de resultado
 
 ```
 ===== OPTIMIZACIÓN POR TIEMPO =====
@@ -29,9 +27,7 @@ Ruta: Zarate -> Buenos_Aires -> Mar_del_Plata
 TOTAL: Tiempo: 4h 41min | Costo: $959.60
 ```
 
-## 🔧 Estructura del código
-
-### Clases principales
+## Clases principales
   - `Vehiculo` - abarca todos los comportamientos y atributos comúnes entre vehículos
     - `Tren` - hereda de la clase vehículo y contempla descuentos por distancia
     - `Camion` - hereda de la clase vehículo y contempla sobrecosto por peso
@@ -40,14 +36,14 @@ TOTAL: Tiempo: 4h 41min | Costo: $959.60
 
 - `Nodo` - representa una ciudad, un punto en el mapa
 - `Conexion` - representa una ruta entre nodos e incluye atributos como la distancia y la restricción (si la hay)
-- **`Planificador`** - construye y compara las rutas posibles y encuentra las óptimas
-- **`Itinerario`** - presenta el resultado final del viaje
+- `Planificador` - construye y compara las rutas posibles y encuentra las óptimas
+- `Itinerario` - presenta el resultado final del viaje
 
-### Restricciones que maneja
-- **Velocidad máxima** en ciertos tramos de tren
-- **Peso máximo** en puentes específicos
-- **Tipo de navegación** (río vs océano)
-- **Probabilidad de mal tiempo** para aviones
+## Restricciones posibles 
+- Velocidad máxima en ciertos tramos de tren
+- Peso máximo en puentes específicos que pueden recorrer los camiones 
+- Tipo de navegación (diferencia entre marítimo y fluvial)
+- Probabilidad de mal tiempo para aviones (afecta su velocidad)
 
 
 
