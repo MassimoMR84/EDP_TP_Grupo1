@@ -1,6 +1,5 @@
-# EDP_TP_Grupo1
+Estructura de Datos y Progrmación - Comisión C - Grupo 1
 Sistema de Transporte
-# Sistema de Transporte - Grupo 1
 
 ## Objeivo del proyecto
 
@@ -46,31 +45,9 @@ TOTAL: Tiempo: 4h 41min | Costo: $959.60
 - Probabilidad de mal tiempo para aviones (afecta su velocidad)
 
 
+## Aprendizajes del proyecto: problemas resueltos
 
-
-
-### Cargas muy pesadas
-Si una carga es muy pesada para un solo vehículo, automáticamente usa varios:
-- 70,000 kg en camiones → usa 3 camiones de 30,000 kg cada uno
-
-### Restricciones de peso
-Si un puente no soporta el peso, busca rutas alternativas:
-- Puente límite 15,000 kg → carga de 20,000 kg busca otra ruta
-
-### Mal clima
-Los aviones pueden ir más lento si hay mal tiempo:
-- Velocidad normal: 600 km/h
-- Con mal tiempo: 400 km/h
-
-## Lo que aprendimos haciendo este proyecto
-
-### Problemas que resolvimos
-1. **Múltiples vehículos** - ¿Cómo repartir carga que no entra en uno solo?
-2. **Restricciones por ruta** - Algunos caminos tienen límites específicos
-3. **Optimización dual** - Mismo algoritmo para tiempo y costo
-4. **Manejo de errores** - ¿Qué pasa si faltan archivos o datos incorrectos?
-
-
-
-
-**Hecho con por Grupo 1 - Estructura de Datos y Programación**
+1. ¿Cómo repartir una carga que no entra en un único vehículo? --> se reparte la carga
+2. Algunos caminos tienen límites específicos --> aplicar restricciones para evitar problemas
+3. Usar un mismo algoritmo para optimizar por tiempo y costo
+4. Manejo de errores (falta de archivos o datos incorrectos)
