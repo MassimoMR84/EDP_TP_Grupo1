@@ -8,6 +8,14 @@ except ImportError:
     MATPLOTLIB_DISPONIBLE = False
     print("Matplotlib no disponible. Gráficos deshabilitados.")
 
+# Mapeo de nombres descriptivos por modo de transporte
+NOMBRES_VEHICULOS = {
+    'ferroviaria': 'Tren',
+    'automotor': 'Camión', 
+    'fluvial': 'Barco',
+    'maritimo': 'Barco',
+    'aerea': 'Avión'
+}
 
 def verificar_matplotlib():
     """Verifica disponibilidad de matplotlib con instrucciones de instalación"""
@@ -15,7 +23,6 @@ def verificar_matplotlib():
         print("Matplotlib no instalado. Instalar con: pip install matplotlib")
         return False
     return True
-
 
 def _crear_nombre_archivo(prefijo, sufijo=""):
     """Crea nombres de archivo descriptivos con timestamp"""
@@ -26,11 +33,10 @@ def _crear_nombre_archivo(prefijo, sufijo=""):
     nombre += f"_{timestamp}"
     return f"output/{nombre}.png"
 
-
 def grafico_distancia_vs_tiempo(itinerario):
     """
     Gráfico de progreso: muestra cómo avanza la distancia a lo largo del tiempo.
-    Útil para visualizar eficiencia temporal de la ruta.
+    Incluye marcas en cambios de tramo y etiquetas con información.
     """
     if not verificar_matplotlib():
         return
@@ -53,20 +59,28 @@ def grafico_distancia_vs_tiempo(itinerario):
         distancias_acumuladas.append(distancia_acum)
     
     # Crear gráfico
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 7))
     plt.plot(tiempos_acumulados, distancias_acumuladas, 
-             color='blue', marker='o', linewidth=2)
+             color='blue', marker='o', linewidth=2, markersize=8)
+    
+    # Agregar marcas en puntos de cambio de tramo
+    for i, tramo in enumerate(itinerario.tramos, 1):
+        nombre_vehiculo = NOMBRES_VEHICULOS.get(tramo.vehiculo.modo_de_transporte, 'Vehículo')
+        plt.scatter(tiempos_acumulados[i], distancias_acumuladas[i], 
+                   s=200, color='red', marker='X', zorder=5)
+        
+        # Etiqueta con información del tramo
+        plt.annotate(f'{nombre_vehiculo}: ${tramo.costo:.0f}', 
+                    (tiempos_acumulados[i], distancias_acumuladas[i]),
+                    xytext=(10, 10), textcoords='offset points', 
+                    fontsize=10, bbox=dict(boxstyle='round,pad=0.3', 
+                    facecolor='yellow', alpha=0.7))
+    
     plt.title(f'Progreso del Viaje - Optimización por {itinerario.kpi_usado.upper()}\n'
               f'Ruta: {" -> ".join(itinerario.obtener_ruta_completa())}', fontsize=16)
     plt.xlabel('Tiempo Acumulado (horas)', fontsize=12)
     plt.ylabel('Distancia Acumulada (km)', fontsize=12)
     plt.grid(True, alpha=0.3)
-    
-    # Anotar tramos
-    for i, tramo in enumerate(itinerario.tramos, 1):
-        plt.annotate(f'Tramo {i}\n{tramo.vehiculo.modo_de_transporte}', 
-                    (tiempos_acumulados[i], distancias_acumuladas[i]),
-                    xytext=(5, 5), textcoords='offset points', fontsize=8)
     
     # Información adicional en el gráfico
     info_text = (f'KPI: {itinerario.kpi_usado.upper()}\n'
@@ -87,11 +101,9 @@ def grafico_distancia_vs_tiempo(itinerario):
     
     plt.show()
 
-
 def grafico_costo_vs_distancia(itinerario):
     """
-    Gráfico de eficiencia económica: cómo se acumula el costo por distancia.
-    Útil para identificar tramos más costosos.
+    Gráfico de eficiencia económica con marcas en cambios de tramo.
     """
     if not verificar_matplotlib():
         return
@@ -114,20 +126,28 @@ def grafico_costo_vs_distancia(itinerario):
         costos_acumulados.append(costo_acum)
     
     # Crear gráfico
-    plt.figure(figsize=(10, 6))
+    plt.figure(figsize=(12, 7))
     plt.plot(distancias_acumuladas, costos_acumulados, 
-             color='purple', marker='X', linewidth=2)
+             color='purple', marker='o', linewidth=2, markersize=8)
+    
+    # Agregar marcas en puntos de cambio de tramo
+    for i, tramo in enumerate(itinerario.tramos, 1):
+        nombre_vehiculo = NOMBRES_VEHICULOS.get(tramo.vehiculo.modo_de_transporte, 'Vehículo')
+        plt.scatter(distancias_acumuladas[i], costos_acumulados[i], 
+                   s=200, color='red', marker='X', zorder=5)
+        
+        # Etiqueta con información del tramo
+        plt.annotate(f'{nombre_vehiculo}: {tramo.distancia}km', 
+                    (distancias_acumuladas[i], costos_acumulados[i]),
+                    xytext=(10, 10), textcoords='offset points', 
+                    fontsize=10, bbox=dict(boxstyle='round,pad=0.3', 
+                    facecolor='lightgreen', alpha=0.7))
+    
     plt.title(f'Análisis de Costos - Optimización por {itinerario.kpi_usado.upper()}\n'
               f'Ruta: {" -> ".join(itinerario.obtener_ruta_completa())}', fontsize=16)
     plt.xlabel('Distancia Acumulada (km)', fontsize=12)
     plt.ylabel('Costo Acumulado ($)', fontsize=12)
     plt.grid(True, alpha=0.3)
-    
-    # Anotar tramos
-    for i, tramo in enumerate(itinerario.tramos, 1):
-        plt.annotate(f'Tramo {i}\n${tramo.costo:.2f}', 
-                    (distancias_acumuladas[i], costos_acumulados[i]),
-                    xytext=(5, 5), textcoords='offset points', fontsize=8)
     
     # Información adicional
     if itinerario.obtener_distancia_total() > 0:
@@ -153,113 +173,88 @@ def grafico_costo_vs_distancia(itinerario):
     
     plt.show()
 
-
-'''def grafico_comparacion_caminos(itinerarios_optimos_por_modo):
+def grafico_costo_vs_distancia_por_modo(itinerarios_optimos_por_modo, mejor_itinerario):
     """
-    Gráfico de barras comparando costos entre diferentes rutas.
-    Permite evaluar rápidamente qué itinerarios son más económicos.
-    """
-    if not verificar_matplotlib():
-        return
-        
-    if not itinerarios_optimos_por_modo:
-        print("No hay itinerarios para comparar")
-        return
-        
-    # Extraer datos
-    nombres = list(itinerarios_optimos_por_modo.keys())
-    costos = [itinerario.costo_total for itinerario in itinerarios_optimos_por_modo.values()]
-    
-    # Crear gráfico de barras
-    plt.figure(figsize=(12, 6))
-    bars = plt.bar(nombres, costos, color='green', width=0.6, alpha=0.7)
-    
-    # Etiquetas con valores sobre las barras
-    for bar, costo in zip(bars, costos):
-        plt.text(bar.get_x() + bar.get_width()/2, 
-                bar.get_height() + max(costos)*0.01, 
-                f'${costo:.2f}', 
-                ha='center', va='bottom', fontsize=10)
-    
-    # Resaltar el mejor (más barato)
-    if costos:
-        min_index = costos.index(min(costos))
-        bars[min_index].set_color('gold')
-        bars[min_index].set_edgecolor('orange')
-        bars[min_index].set_linewidth(2)
-    
-    plt.title('Comparación de Costos por Camino', fontsize=16)
-    plt.xlabel('Caminos', fontsize=12)
-    plt.ylabel('Costo Total ($)', fontsize=12)
-    plt.xticks(rotation=45)
-    plt.grid(True, alpha=0.3, axis='y')
-    plt.tight_layout()
-    
-    # Guardar con nombre descriptivo
-    nombre_archivo = _crear_nombre_archivo("comparativo_costos")
-    plt.savefig(nombre_archivo, dpi=300, bbox_inches='tight')
-    print(f"Gráfico comparativo de costos guardado: {nombre_archivo}")
-    
-    plt.show()
-
-def grafico_comparacion_tiempos(itinerarios_optimos_por_modo):
-    """
-    Gráfico de barras comparando tiempos entre diferentes rutas.
-    Útil para optimización temporal.
+    NUEVO: Gráfico que muestra cómo varía el costo total según la distancia 
+    recorrida para cada tipo de vehículo (modo de transporte).
     """
     if not verificar_matplotlib():
         return
         
-    if not itinerarios_optimos_por_modo:
-        print("No hay itinerarios para comparar")
-        return
-        
-    # Extraer datos
-    nombres = list(itinerarios_optimos_por_modo.keys())
-    tiempos = [itinerario.tiempo_total for itinerario in itinerarios_optimos_por_modo.values()]
-    
-    # Crear gráfico
-    plt.figure(figsize=(12, 6))
-    bars = plt.bar(nombres, tiempos, color='orange', width=0.6, alpha=0.7)
-    
-    # Etiquetas con formato tiempo legible
-    for bar, tiempo in zip(bars, tiempos):
-        horas = int(tiempo)
-        minutos = int((tiempo - horas) * 60)
-        plt.text(bar.get_x() + bar.get_width()/2, 
-                bar.get_height() + max(tiempos)*0.01, 
-                f'{horas}h {minutos}m', 
-                ha='center', va='bottom', fontsize=10)
-    
-    # Resaltar el mejor (más rápido)
-    if tiempos:
-        min_index = tiempos.index(min(tiempos))
-        bars[min_index].set_color('gold')
-        bars[min_index].set_edgecolor('orange')
-        bars[min_index].set_linewidth(2)
-    
-    plt.title('Comparación de Tiempos por Camino', fontsize=16)
-    plt.xlabel('Caminos', fontsize=12)
-    plt.ylabel('Tiempo Total (horas)', fontsize=12)
-    plt.xticks(rotation=45)
-    plt.grid(True, alpha=0.3, axis='y')
-    plt.tight_layout()
-    
-    # Guardar con nombre descriptivo
-    nombre_archivo = _crear_nombre_archivo("comparativo_tiempos")
-    plt.savefig(nombre_archivo, dpi=300, bbox_inches='tight')
-    print(f"Gráfico comparativo de tiempos guardado: {nombre_archivo}")
-    
-    plt.show()
-
-'''
-
-def grafico_tiempo_vs_distancia_por_modo(itinerarios_optimos_por_modo, mejor_itinerario):
     if not itinerarios_optimos_por_modo:
         print("No hay itinerarios para graficar.")
         return
 
-    plt.figure(figsize=(12, 6))
+    plt.figure(figsize=(12, 8))
+    
+    # Colores y marcadores específicos para cada modo
+    estilos_modo = {
+        'ferroviaria': {'color': 'blue', 'marker': 's', 'linestyle': '-'},      # Cuadrado
+        'automotor': {'color': 'green', 'marker': '^', 'linestyle': '--'},     # Triángulo
+        'fluvial': {'color': 'cyan', 'marker': 'd', 'linestyle': '-.'},        # Diamante
+        'maritimo': {'color': 'navy', 'marker': 'd', 'linestyle': '-.'},       # Diamante
+        'aerea': {'color': 'red', 'marker': 'v', 'linestyle': ':'}             # Triángulo invertido
+    }
+
+    for modo, itinerario in itinerarios_optimos_por_modo.items():
+        costos = [0]
+        distancias = [0]
+        costo_acumulado = 0
+        distancia_acumulada = 0
+
+        for tramo in itinerario.tramos:
+            costo_acumulado += tramo.costo
+            distancia_acumulada += tramo.distancia
+            costos.append(costo_acumulado)
+            distancias.append(distancia_acumulada)
+
+        # Obtener estilo para este modo
+        estilo = estilos_modo.get(modo, {'color': 'gray', 'marker': 'o', 'linestyle': '-'})
+        nombre_vehiculo = NOMBRES_VEHICULOS.get(modo, 'Vehículo')
+        
+        # Resaltar el mejor itinerario
+        if itinerario == mejor_itinerario:
+            plt.plot(distancias, costos, 
+                    label=f"★ {nombre_vehiculo.upper()} (ÓPTIMO)", 
+                    linewidth=5, color='gold', marker='*', markersize=15,
+                    linestyle='-', markeredgecolor='orange', markeredgewidth=2)
+        else:
+            plt.plot(distancias, costos, 
+                    label=f"{nombre_vehiculo}", 
+                    linewidth=3, color=estilo['color'], 
+                    marker=estilo['marker'], markersize=10,
+                    linestyle=estilo['linestyle'], alpha=0.8)
+
+    plt.xlabel("Distancia Acumulada (km)", fontsize=12)
+    plt.ylabel("Costo Acumulado ($)", fontsize=12)
+    plt.title("Comparación de Costos por Modo de Transporte", fontsize=16)
+    plt.legend(fontsize=11, loc='best')
+    plt.grid(True, alpha=0.3)
+    plt.tight_layout()
+    
+    # Guardar
+    nombre_archivo = _crear_nombre_archivo("costo_vs_distancia_por_modo")
+    plt.savefig(nombre_archivo, dpi=300, bbox_inches='tight')
+    print(f"Gráfico costo vs distancia por modo guardado: {nombre_archivo}")
+    
+    plt.show()
+
+def grafico_tiempo_vs_distancia_por_modo(itinerarios_optimos_por_modo, mejor_itinerario):
+    """Gráfico mejorado con diferentes marcadores y mejor diferenciación visual"""
+    if not itinerarios_optimos_por_modo:
+        print("No hay itinerarios para graficar.")
+        return
+
+    plt.figure(figsize=(12, 8))
+    
+    # Colores y marcadores específicos para cada modo
+    estilos_modo = {
+        'ferroviaria': {'color': 'blue', 'marker': 's', 'linestyle': '-'},      # Cuadrado
+        'automotor': {'color': 'green', 'marker': '^', 'linestyle': '--'},     # Triángulo
+        'fluvial': {'color': 'cyan', 'marker': 'd', 'linestyle': '-.'},        # Diamante
+        'maritimo': {'color': 'navy', 'marker': 'd', 'linestyle': '-.'},       # Diamante
+        'aerea': {'color': 'red', 'marker': 'v', 'linestyle': ':'}             # Triángulo invertido
+    }
 
     for modo, itinerario in itinerarios_optimos_por_modo.items():
         tiempos = [0]
@@ -273,25 +268,40 @@ def grafico_tiempo_vs_distancia_por_modo(itinerarios_optimos_por_modo, mejor_iti
             tiempos.append(tiempo_acumulado)
             distancias.append(distancia_acumulada)
 
+        # Obtener estilo para este modo
+        estilo = estilos_modo.get(modo, {'color': 'gray', 'marker': 'o', 'linestyle': '-'})
+        nombre_vehiculo = NOMBRES_VEHICULOS.get(modo, 'Vehículo')
+        
+        # Resaltar el mejor itinerario
         if itinerario == mejor_itinerario:
-            plt.plot(tiempos, distancias, label=f"{modo} (óptimo)", linewidth=3, color='gold')
+            plt.plot(tiempos, distancias, 
+                    label=f"★ {nombre_vehiculo.upper()} (ÓPTIMO)", 
+                    linewidth=5, color='gold', marker='*', markersize=15,
+                    linestyle='-', markeredgecolor='orange', markeredgewidth=2)
         else:
-            plt.plot(tiempos, distancias, label=modo, linewidth=1.8)
+            plt.plot(tiempos, distancias, 
+                    label=f"{nombre_vehiculo}", 
+                    linewidth=3, color=estilo['color'], 
+                    marker=estilo['marker'], markersize=10,
+                    linestyle=estilo['linestyle'], alpha=0.8)
 
-    plt.xlabel("Tiempo Acumulado (min)")
-    plt.ylabel("Distancia Acumulada (km)")
-    plt.title("Comparación de Itinerarios Óptimos por Modo")
-    plt.legend()
+    plt.xlabel("Tiempo Acumulado (min)", fontsize=12)
+    plt.ylabel("Distancia Acumulada (km)", fontsize=12)
+    plt.title("Comparación de Tiempo vs Distancia por Modo", fontsize=16)
+    plt.legend(fontsize=11, loc='best')
     plt.grid(True, alpha=0.3)
     plt.tight_layout()
+    
+    # Guardar
+    nombre_archivo = _crear_nombre_archivo("tiempo_vs_distancia_por_modo")
+    plt.savefig(nombre_archivo, dpi=300, bbox_inches='tight')
+    print(f"Gráfico tiempo vs distancia por modo guardado: {nombre_archivo}")
+    
     plt.show()
-
-
 
 def generar_todos_los_graficos(itinerario, nombre_itinerario="Itinerario"):
     """
     Genera conjunto completo de gráficos para un itinerario.
-    Función de conveniencia para análisis integral.
     """
     if not verificar_matplotlib():
         return
@@ -301,7 +311,6 @@ def generar_todos_los_graficos(itinerario, nombre_itinerario="Itinerario"):
     try:
         grafico_distancia_vs_tiempo(itinerario)
         grafico_costo_vs_distancia(itinerario)
-        grafico_tiempo_vs_distancia_por_modo(Planificador.optimos_por_modo(), Planificador.generar_itinerario())
         print("Gráficos generados correctamente")
     except Exception as e:
         print(f"Error generando gráficos: {e}")

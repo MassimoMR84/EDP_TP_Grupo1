@@ -1,5 +1,6 @@
 from nodo import Nodo
-from itinerario import Itinerario, Tramo
+from itinerario import Itinerario
+from tramo import Tramo
 from vehiculos import Vehiculo, Camion, Tren, Barco, Avion
 
 class Planificador: 
