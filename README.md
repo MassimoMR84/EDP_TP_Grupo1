@@ -1,7 +1,7 @@
 Estructura de Datos y Progrmación - Comisión C - Grupo 1
 Sistema de Transporte
 
-## Objeivo del proyecto
+## Objetivo del proyecto
 
 Encontrar un sistema que encuentre la mejor ruta para transportar carga entre ciudades de Argentina. La "mejor ruta" puede definirse de dos formas:
 - La que se recorra en menos tiempo (optimización por tiempo)
@@ -44,10 +44,3 @@ TOTAL: Tiempo: 4h 41min | Costo: $959.60
 - Tipo de navegación (diferencia entre marítimo y fluvial)
 - Probabilidad de mal tiempo para aviones (afecta su velocidad)
 
-
-## Aprendizajes del proyecto: problemas resueltos
-
-1. ¿Cómo repartir una carga que no entra en un único vehículo? --> se reparte la carga
-2. Algunos caminos tienen límites específicos --> aplicar restricciones para evitar problemas
-3. Usar un mismo algoritmo para optimizar por tiempo y costo
-4. Manejo de errores (falta de archivos o datos incorrectos)
