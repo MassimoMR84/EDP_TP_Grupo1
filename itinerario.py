@@ -1,6 +1,7 @@
 from validaciones import *
 from funciones_auxiliares import *
 from tramo import Tramo
+from pila import *
 
 class Itinerario:
     """
@@ -113,7 +114,63 @@ class Itinerario:
             return f"{self.obtener_tiempo_total_formateado()}"
         else:
             return f"${self.costo_total:.2f}"
-    
+        
+    def calcular_recargas_y_combustible(self):
+        """
+        Calcula:
+        - la cantidad de recargas necesarias
+        - el combustible restante (en litros y %)
+        - guerda en una pila cada recagra con su ubicacion, nodo de origen y nodo de destino
+        """
+
+        if not self.tramos:
+            return
+
+        vehiculo = self.tramos[0].vehiculo
+        capacidad_combustible = vehiculo.capacidad_combustible
+        rendimiento = vehiculo.rendimiento  
+
+        combustible = capacidad_combustible
+        km_acumulado = 0
+        self.cantidad_recargas = 0
+        self.historial_recargas = Pila()
+
+        for tramo in self.tramos:
+            distancia = tramo.distancia   
+            consumo = distancia * rendimiento
+
+            if combustible >= consumo:
+                # alcanza para todo el tramo
+                combustible -= consumo
+                km_acumulado += distancia
+            else:
+                # necesitamos recargar dentro del tramo
+                distancia_restante = distancia
+                nodo_origen = tramo.origen.nombre
+                nodo_destino = tramo.destino.nombre
+
+                while combustible < distancia_restante * rendimiento:
+                    # avanza lo que puede con el combustible que le queda
+                    km_avance = combustible / rendimiento
+                    km_acumulado += km_avance
+                    distancia_restante -= km_avance
+
+                    # registrar recarga
+                    self.cantidad_recargas += 1
+                    self.historial_recargas.apilar(NodoPila(km_acumulado, nodo_origen, nodo_destino))
+
+                    # recargar tanque lleno
+                    combustible = capacidad_combustible
+
+                # después de última recarga, se termina el tramo
+                consumo_final = distancia_restante * rendimiento
+                combustible -= consumo_final
+                km_acumulado += distancia_restante
+
+        # calculo de combusitble restante
+        self.combustible_restante_litros = round(combustible, 2)
+        self.combustible_restante_porcentaje = round((combustible / capacidad_combustible) * 100, 2)
+        
     def __str__(self):
         if not self.tramos:
             return "Itinerario vacío"

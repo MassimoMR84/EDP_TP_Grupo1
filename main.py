@@ -66,6 +66,18 @@ def procesar_optimizacion(planificador, solicitud, kpi):
         if itinerario:
             print("Ruta encontrada:")
             print(itinerario)
+
+            
+            print("\nRESUMEN DE RECARGAS")
+            print("-" * 30)
+            print(f"Cantidad de recargas realizadas: {itinerario.cantidad_recargas}")
+            print(f"Combustible restante en L: {itinerario.combustible_restante_litros} litros")
+            print(f"Combustible restante en %: {itinerario.combustible_restante_porcentaje}%")
+
+            print("\nHistorial de recargas (última → primera):")
+            itinerario.historial_recargas.visualizarPila()
+            print("\n" + "="*60)
+        
             return itinerario
         else:
             print("No se encontró ruta válida")

@@ -8,19 +8,23 @@ class Vehiculo:
     Define interfaz común y lógica de distribución de carga.
     """
     
-    def __init__(self, velocidad_nominal, capacidad_carga, costo_fijo, costo_km, costo_kg):
+    def __init__(self, velocidad_nominal, capacidad_carga, costo_fijo, costo_km, costo_kg, capacidad_combustible, rendimiento):
         # Validar todos los parámetros
         validar_positivo(velocidad_nominal)
         validar_mayor_cero(capacidad_carga)
         validar_positivo(costo_fijo)
         validar_positivo(costo_km)
         validar_positivo(costo_kg)
-
+        validar_mayor_cero(capacidad_combustible)
+        validar_mayor_cero(rendimiento)
+        
         self.velocidad_nominal = velocidad_nominal
         self.capacidad_de_carga = capacidad_carga
         self.costo_fijo_uso = costo_fijo
         self.costo_km_recorrido = costo_km
         self.costo_kg_transportado = costo_kg
+        self.capacidad_combustible = capacidad_combustible
+        self.rendimiento = rendimiento
         self.modo_de_transporte = 'generico'
 
     def __str__(self):
@@ -102,10 +106,12 @@ class Tren(Vehiculo):
             velocidad=100.0
             
         super().__init__(velocidad_nominal=velocidad,   # km/h
-                         capacidad_carga=150000,  # kg - muy alta capacidad
-                         costo_fijo=100,          # $
-                         costo_km=20,             # $/km
-                         costo_kg=3)              # $/kg
+                         capacidad_carga=150000,        # kg - muy alta capacidad
+                         costo_fijo=100,                # $
+                         costo_km=20,                   # $/km
+                         costo_kg=3,                    # $/kg
+                         capacidad_combustible=3000,    # L
+                         rendimiento=3)                 # L/km
         self.modo_de_transporte = 'ferroviaria'
 
     def calcular_costo_tramo(self, distancia, carga):
@@ -150,11 +156,13 @@ class Camion(Vehiculo):
     """
     
     def __init__(self):
-        super().__init__(velocidad_nominal=80,     # km/h
-                         capacidad_carga=30000,    # kg
-                         costo_fijo=30,            # $
-                         costo_km=5,               # $/km
-                         costo_kg=1)               # $/kg
+        super().__init__(velocidad_nominal=80,       # km/h
+                         capacidad_carga=30000,      # kg
+                         costo_fijo=30,              # $
+                         costo_km=5,                 # $/km
+                         costo_kg=1,                 # $/kg
+                         capacidad_combustible=300,  # L
+                         rendimiento=2)              # L/km   
         self.modo_de_transporte = 'automotor'  
     
     def calcular_costo_por_carga(self, carga):
@@ -200,11 +208,13 @@ class Barco(Vehiculo):
         else:
             costo = 1500  # Navegación marítima
             
-        super().__init__(velocidad_nominal=40,      # km/h
-                         capacidad_carga=100000,    # kg - alta capacidad
-                         costo_fijo=costo,          # $ - variable según tipo
-                         costo_km=15,               # $/km
-                         costo_kg=2)                # $/kg
+        super().__init__(velocidad_nominal=40,          # km/h
+                         capacidad_carga=100000,        # kg - alta capacidad
+                         costo_fijo=costo,              # $ - variable según tipo
+                         costo_km=15,                   # $/km
+                         costo_kg=2,                    # $/kg
+                         capacidad_combustible=100000,  # L
+                         rendimiento=45)                # L/km
         
         self.modo_de_transporte = tipo_navegacion
 
@@ -216,11 +226,13 @@ class Avion(Vehiculo):
     """
     
     def __init__(self, prob_mal_tiempo=0):
-        super().__init__(velocidad_nominal=600,     # km/h - muy rápido
-                         capacidad_carga=5000,      # kg - limitada
-                         costo_fijo=750,            # $ - alto costo
-                         costo_km=40,               # $/km - costoso
-                         costo_kg=10)               # $/kg - el más caro
+        super().__init__(velocidad_nominal=600,       # km/h - muy rápido
+                         capacidad_carga=5000,        # kg - limitada
+                         costo_fijo=750,              # $ - alto costo
+                         costo_km=40,                 # $/km - costoso
+                         costo_kg=10,                 # $/kg - el más caro
+                         capacidad_combustible=1000,  # L
+                         rendimiento=3.5)             # L/km           
         
         self.modo_de_transporte = 'aerea'
         self.prob_mal_tiempo = prob_mal_tiempo

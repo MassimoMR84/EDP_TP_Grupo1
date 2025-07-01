@@ -131,6 +131,7 @@ class Planificador:
                 #Construir todas las conexiones
                 if len(conexiones) == len(ruta) - 1:
                     itinerario = self._construir_itinerario_con_conexiones(conexiones, carga, kpi)
+                    itinerario.calcular_recargas_y_combustible()
                     valor_kpi = itinerario.tiempo_total if kpi == "tiempo" else itinerario.costo_total
 
                     #Analiza para cada modo si su valor segun el kpi es el mejor
