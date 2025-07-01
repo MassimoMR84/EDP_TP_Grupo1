@@ -20,7 +20,18 @@ class Itinerario:
         self.tiempo_total = 0.0
         self.kpi_usado = kpi_usado
         self.carga_solicitud = validar_positivo(carga_solicitud)
-    
+        
+    def __eq__(self, other):
+        if not isinstance(other, Itinerario):
+            return False
+
+        return (
+            self.tramos == other.tramos and
+            self.kpi_usado == other.kpi_usado and
+            self.carga_solicitud == other.carga_solicitud
+        )
+
+
     def _obtener_nombre_nodo(self, nodo):
         """Extrae nombre del nodo de forma robusta"""
         if hasattr(nodo, 'nombre'):  

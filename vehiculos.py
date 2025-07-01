@@ -28,7 +28,7 @@ class Vehiculo:
         self.modo_de_transporte = 'generico'
 
     def __str__(self):
-        return (f"Modo: {self.modo_de_transporte}\n"
+        return (f"Modo: {self.modo_de_transporte.capitalize()}\n"
                 f"Velocidad: {self.velocidad_nominal} km/h\n"
                 f"Capacidad: {self.capacidad_de_carga} kg\n"
                 f"Costo fijo: ${self.costo_fijo_uso}\n"
