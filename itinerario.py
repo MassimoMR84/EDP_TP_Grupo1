@@ -23,7 +23,6 @@ class Itinerario:
         self.historial_recargas=Pila()
         self.combustible_restante_litros=None
         self.combustible_restante_porcentaje=None
-        self.recargas=0
 
     def __eq__(self, other):
         if not isinstance(other, Itinerario):
