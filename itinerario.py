@@ -147,7 +147,6 @@ class Itinerario:
 
         combustible = capacidad_combustible
         km_acumulado = 0
-        self.cantidad_recargas = 0
         '''Se usa una pila porque se hace como un resumen de tarjeta de crédito (lo primera transacción que aparece es la última que se realizó)'''
 
         for tramo in self.tramos:
