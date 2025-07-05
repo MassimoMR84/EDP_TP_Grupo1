@@ -1,0 +1,68 @@
+RESUMEN DEL SISTEMA DE TRANSPORTE
+==================================================
+
+ESTADÍSTICAS GENERALES:
+  Nodos: 5
+  Conexiones: 34
+  Solicitudes: 2
+
+CONEXIONES POR TIPO:
+  Ferroviaria: 10
+  Automotor: 14
+  Fluvial: 4
+  Aerea: 6
+
+SOLICITUDES POR CATEGORÍA DE PESO:
+  Ligeras: 0
+  Medianas: 0
+  Pesadas: 2
+
+DETALLE DE NODOS:
+
+Zarate:
+  -> Buenos_Aires (ferroviaria, 85.0km) [Velocidad máxima: 80.0 km/h]
+  -> Junin (ferroviaria, 185.0km)
+  -> Buenos_Aires (automotor, 85.0km)
+  -> Junin (automotor, 185.0km) [Peso máximo: 15000.0 kg]
+  -> Buenos_Aires (fluvial, 85.0km) [Tipo de navegación: fluvial]
+
+Buenos_Aires:
+  -> Zarate (ferroviaria, 85.0km) [Velocidad máxima: 80.0 km/h]
+  -> Mar_del_Plata (ferroviaria, 384.0km)
+  -> Zarate (automotor, 85.0km)
+  -> Junin (automotor, 238.0km)
+  -> Azul (automotor, 278.0km)
+  -> Mar_del_Plata (automotor, 384.0km)
+  -> Zarate (fluvial, 85.0km) [Tipo de navegación: fluvial]
+  -> Mar_del_Plata (fluvial, 384.0km) [Tipo de navegación: maritimo]
+  -> Junin (aerea, 238.0km) [Probabilidad de mal tiempo: 10.0%]
+  -> Azul (aerea, 278.0km) [Probabilidad de mal tiempo: 20.0%]
+  -> Mar_del_Plata (aerea, 384.0km) [Probabilidad de mal tiempo: 30.0%]
+
+Junin:
+  -> Zarate (ferroviaria, 185.0km)
+  -> Azul (ferroviaria, 265.0km)
+  -> Zarate (automotor, 185.0km) [Peso máximo: 15000.0 kg]
+  -> Buenos_Aires (automotor, 238.0km)
+  -> Azul (automotor, 265.0km)
+  -> Buenos_Aires (aerea, 238.0km) [Probabilidad de mal tiempo: 10.0%]
+
+Azul:
+  -> Junin (ferroviaria, 265.0km)
+  -> Mar_del_Plata (ferroviaria, 246.0km)
+  -> Junin (automotor, 265.0km)
+  -> Buenos_Aires (automotor, 278.0km)
+  -> Mar_del_Plata (automotor, 246.0km)
+  -> Buenos_Aires (aerea, 278.0km) [Probabilidad de mal tiempo: 20.0%]
+
+Mar_del_Plata:
+  -> Azul (ferroviaria, 246.0km)
+  -> Buenos_Aires (ferroviaria, 384.0km)
+  -> Azul (automotor, 246.0km)
+  -> Buenos_Aires (automotor, 384.0km)
+  -> Buenos_Aires (fluvial, 384.0km) [Tipo de navegación: maritimo]
+  -> Buenos_Aires (aerea, 384.0km) [Probabilidad de mal tiempo: 30.0%]
+
+SOLICITUDES:
+  IdCarga: #CARGA_001 | Peso: 70000.0 kg | Origen: Zarate → Destino: Mar_del_Plata
+  IdCarga: #CARGA_002 | Peso: 100000.0 kg | Origen: Mar_del_Plata → Destino: Junin

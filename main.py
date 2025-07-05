@@ -73,9 +73,9 @@ def procesar_optimizacion(planificador, solicitud, kpi):
             print("\nRESUMEN DE RECARGAS DEL ÓPTIMO")
             print("-" * 30)
             print(f"{mejor_itinerario.tramos[0].vehiculo} ")
-            print(f"Cantidad de recargas realizadas: {len(mejor_itinerario.historial_recargas)}")
-            print(f"Combustible restante en L: {mejor_itinerario.combustible_restante_litros} litros")
-            print(f"Combustible restante en %: {mejor_itinerario.combustible_restante_porcentaje}%")
+            print(f"Cantidad de recargas por vehículo realizadas: {len(mejor_itinerario.historial_recargas)}")
+            print(f"Combustible restante por vehículo (L): {mejor_itinerario.combustible_restante_litros} litros")
+            print(f"Combustible restante por vehículo (% del tanque): {mejor_itinerario.combustible_restante_porcentaje}%")
 
             print("\nHistorial de recargas (última → primera):")
             mejor_itinerario.historial_recargas.visualizarPila()
@@ -88,9 +88,9 @@ def procesar_optimizacion(planificador, solicitud, kpi):
             for modo, itin in itinerarios_optimos.items():
                 if itin is not mejor_itinerario:  # evita imprimir el óptimo dos veces
                     print(f"Modo: {modo.capitalize()}")
-                    print(f"Cantidad de recargas realizadas: {len(itin.historial_recargas)}")
-                    print(f"Combustible restante en L: {itin.combustible_restante_litros} litros")
-                    print(f"Combustible restante en %: {itin.combustible_restante_porcentaje}%")
+                    print(f"Cantidad de recargas por vehículo realizadas: {len(itin.historial_recargas)}")
+                    print(f"Combustible restante por vehículo (L): {itin.combustible_restante_litros} litros")
+                    print(f"Combustible restante por vehículo (% del tanque): {itin.combustible_restante_porcentaje}%")
                     print("Historial de recargas (última → primera):")
                     itin.historial_recargas.visualizarPila()
                     print("-" * 30)

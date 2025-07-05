@@ -63,9 +63,21 @@ class SistemaTransporte:
                             valorRestriccion=valor_restriccion
                         )
                         
-                        nodo_origen.agregarConexiones(conexion)
                         self.conexiones.append(conexion)
                         conexiones_agregadas += 1
+                        if True:
+                            conexion = Conexion(
+                                origen=nodo_destino,
+                                destino=nodo_origen,
+                                tipo=tipo,
+                                distancia=distancia,
+                                restriccion=restriccion,
+                                valorRestriccion=valor_restriccion
+                            )
+                        
+                            self.conexiones.append(conexion)
+                            conexiones_agregadas += 1
+
                     else:
                         print(f"Nodos no encontrados: {origen_nombre} -> {destino_nombre}")
                 

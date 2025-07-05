@@ -18,6 +18,8 @@ class Conexion:
         if self.restriccion and valorRestriccion:
             self.valorRestriccion=validar_restriccion_conexion(self.restriccion, valorRestriccion)
 
+        self.origen.agregar_conexiones(self)
+
     def __str__ (self):
         base = f"Conexión de {self.origen} a {self.destino} ({self.tipo}): {self.distancia} km"
         if self.restriccion:

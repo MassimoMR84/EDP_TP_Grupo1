@@ -24,5 +24,5 @@ class Nodo():
         '''Permite que el nodo sea usado como clave en un diccionario'''
         return hash(self.nombre)
 
-    def agregarConexiones(self, conexion):
+    def agregar_conexiones(self, conexion):
         self.conexiones.append(conexion)
