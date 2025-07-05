@@ -20,7 +20,11 @@ class Itinerario:
         self.tiempo_total = 0.0
         self.kpi_usado = kpi_usado
         self.carga_solicitud = validar_positivo(carga_solicitud)
-        
+        self.historial_recargas=Pila()
+        self.combustible_restante_litros=None
+        self.combustible_restante_porcentaje=None
+        self.recargas=0
+
     def __eq__(self, other):
         if not isinstance(other, Itinerario):
             return False
@@ -144,7 +148,7 @@ class Itinerario:
         combustible = capacidad_combustible
         km_acumulado = 0
         self.cantidad_recargas = 0
-        self.historial_recargas = Pila()
+        '''Se usa una pila porque se hace como un resumen de tarjeta de crédito (lo primera transacción que aparece es la última que se realizó)'''
 
         for tramo in self.tramos:
             distancia = tramo.distancia   
@@ -167,7 +171,6 @@ class Itinerario:
                     distancia_restante -= km_avance
 
                     # registrar recarga
-                    self.cantidad_recargas += 1
                     self.historial_recargas.apilar(NodoPila(km_acumulado, nodo_origen, nodo_destino))
 
                     # recargar tanque lleno

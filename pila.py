@@ -17,6 +17,7 @@ class NodoPila():
 
 
 class Pila:
+    '''Se usa una pila porque se hace como un resumen de tarjeta de crédito para el historial de recargas (lo primera transacción que aparece es la última que se realizó)'''
     def __init__(self):
         self.cima = None
         self.longitud = 0
@@ -41,3 +42,6 @@ class Pila:
             while actual:
                 print(actual)
                 actual = actual.sig
+
+    def __len__(self):
+        return self.longitud
